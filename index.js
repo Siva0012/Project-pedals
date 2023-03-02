@@ -57,5 +57,5 @@ app.use((err, req, res, next) => {
 
 
 app.listen(3000 , () =>{
-    console.log('server started');
+    console.log('server has started at port 3000');
 })
