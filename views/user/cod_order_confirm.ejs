@@ -1,0 +1,142 @@
+<%- include('../layout/user/user_header.ejs') %>
+<%- include('../user/user_nav.ejs') %>
+
+<!-- <div class="container">
+    <div class="row mb-3">
+        <div class="flex-box d-flex justify-content-center">
+            <div class="col-6" style="background-color: blanchedalmond;">
+
+                <div class="order-body-flex text-align-center">
+                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ullam labore repellat quasi nostrum beatae cumque aut, repudiandae, quo assumenda doloribus itaque consequatur quae optio hic qui quidem. Excepturi magni dignissimos at culpa officia ipsa quasi?</p>
+                    <div class="col ">
+                        <div class="title border border-primary-subtle text-center">
+                            <h5>Your order has been confirmed</h5>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="order-fields border border-primary-subtle d-flex justify-content-between py-3">
+                            <div class="col-4">
+                                Order Id
+                            </div>
+                            <div class="col-8">
+                                34252346266346
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="order-fields border border-primary-subtle d-flex justify-content-between py-3">
+                            <div class="col-4">
+                                Order Id
+                            </div>
+                            <div class="col-8">
+                                34252346266346
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="order-fields border border-primary-subtle d-flex justify-content-between py-3">
+                            <div class="col-4">
+                                Order Id
+                            </div>
+                            <div class="col-8">
+                                34252346266346
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="flex-box d-flex justify-content-center">
+            <div class="col-6" style="background-color: rgb(116, 93, 59);">
+                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ullam labore repellat quasi nostrum beatae cumque aut, repudiandae, quo assumenda doloribus itaque consequatur quae optio hic qui quidem. Excepturi magni dignissimos at culpa officia ipsa quasi?</p>
+
+            </div>
+        </div>
+    </div>
+</div> -->
+<% const inFormat = new Intl.NumberFormat('en-IN' , {style : 'currency' , currency : 'INR'}) %>
+<section class="h-100 gradient-custom">
+    <div class="container py-5 h-100">
+      <div class="row d-flex justify-content-center align-items-center h-100">
+        <div class="col-lg-10 col-xl-8">
+          <div class="card" style="border-radius: 10px;">
+            <div class="card-header px-4 py-5">
+              <h5 class="text-muted mb-0">Thanks for your Order, <span style="color: #a8729a;"><%= userName %></span>!</h5>
+            </div>
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <p class="lead fw-normal mb-0" style="color: #a8729a;">Receipt</p>
+                    <p class="small text-muted mb-0">Receipt Voucher : 1KAU9-84UIL</p>
+                </div>
+    
+                <!----------------------------->
+                <% orderData.product.forEach((product) =>{ %>
+
+                    <div class="card shadow-0 border mb-4">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <img src="/product_images/<%= product.productId.images[0] %>"
+                                        class="img-fluid" alt="Phone">
+                                </div>
+                                <div class="col-md-2 text-center d-flex justify-content-center align-items-center">
+                                    <p class="text-muted mb-0"><%= product.productId.name %></p>
+                                </div>
+                                <!-- <div class="col-md-2 text-center d-flex justify-content-center align-items-center">
+                                    <p class="text-muted mb-0 small">White</p>
+                                </div> -->
+                                <!-- <div class="col-md-2 text-center d-flex justify-content-center align-items-center">
+                                    <p class="text-muted mb-0 small">Capacity: 64GB</p>
+                                </div> -->
+                                <div class="col-md-2 text-center d-flex justify-content-center align-items-center">
+                                    <p class="text-muted mb-0 small">Qty: <%= product.quantity %></p>
+                                </div>
+                                <div class="col-md-2 text-center d-flex justify-content-center align-items-center">
+                                    <% const productTotalAmount = product.productTotalAmount %>
+                                    <p class="text-muted mb-0 small"><%= inFormat.format(productTotalAmount) %></p>
+                                </div>
+                            </div>
+                
+                        </div>
+                    </div>
+
+                <% }) %>
+  
+              <div class="d-flex justify-content-between pt-2">
+                <p class="fw-bold mb-0">Order Details</p>
+              </div>
+  
+              <div class="d-flex justify-content-between pt-2">
+                <p class="text-muted mb-0">Delivery : Address </p> <span><%= orderData.deliveryAddress %></span>
+                <!-- <p class="text-muted mb-0"><span class="fw-bold me-4">Discount</span> $19.00</p> -->
+              </div>
+  
+              <div class="d-flex justify-content-between">
+                <% const date = orderData.date %>
+                <p class="text-muted mb-0">Order placed on : <%= moment(date).format('MMMM Do YYYY, h:mm:ss a') %>  </p>
+              </div>
+  
+              <!-- <div class="d-flex justify-content-between mb-5">
+                <p class="text-muted mb-0">Recepits Voucher : 18KU-62IIK</p>
+                <p class="text-muted mb-0"><span class="fw-bold me-4">Delivery Charges</span> Free</p>
+              </div> -->
+            </div>
+            <div class="card-footer border-0 px-4 py-5"
+              style="background-color: #a8729a; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px;">
+              <% const price = orderData.total %>
+              
+              <h5 class="d-flex align-items-center justify-content-end text-white text-uppercase mb-0">Total
+                paid: <span class="h2 mb-0 ms-2"><%= inFormat.format(price) %>
+            </span></h5>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+<%- include('../layout/user/user_footer.ejs') %>

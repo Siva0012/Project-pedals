@@ -1,0 +1,72 @@
+
+<%- include('../layout/header.ejs'); %>
+
+    <div class="containerfluid">
+        
+        <div class="background d-flex flex-column align-items-center justify-content-center" style="background-color: rgb(139, 139, 139);  height:100vh ;">
+
+            <div class="heading text-black mb-4">
+                <h1>Login</h1>
+            </div>
+                <div class="container">
+
+                    <div class="row">
+                        <div class="col col-md-12">
+
+                            <div class="form-container d-flex justify-content-center align-items-center flex-column">
+
+                                <div class="content-wrapper border border-black rounded-4 p-5">
+
+                                    <form class="text-black" action="" method="post" onsubmit="return validateForm()">
+                                        <div class="mb-3">
+
+                                          <label for="exampleInputEmail1" class="form-label">Admin name</label>
+                                          <input type="text" name="adminname" value="siva" class="form-control" id="firstName">
+                                        
+                                        </div>
+
+                                        <div class="mb-3">
+                                          <label for="exampleInputPassword1" class="form-label">Password</label>
+                                          <input type="password" name="password" value="123" class="form-control" id="exampleInputPassword1">
+                                        </div>
+
+                                       
+                                        <button type="submit" class="btn btn-primary">Login</button>
+
+                                        <% if(typeof loginError !== 'undefined') { %>
+                                            <div class="alert alert-warning mt-4" role="alert">
+                                                <%= loginError %>
+                                            </div>
+                                        <% } %>
+                                        
+                                       
+
+                                    </form>
+    
+                                    
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                    
+                </div>
+        </div>
+    </div>
+
+    <script>
+        function validateForm() {
+          let inputs = document.getElementsByTagName("input")
+  
+          for(let i=0; i< inputs.length; i++){
+            if(inputs[i].value == ""){
+              alert("All fields are required!!")
+              return false;
+            }
+          }
+          return true;
+        }
+      </script>
+
+    <%- include('../layout/footer.ejs'); %>

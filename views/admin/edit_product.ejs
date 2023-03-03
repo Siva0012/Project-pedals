@@ -1,0 +1,214 @@
+<%- include('../layout/admin/admin_header.ejs')  %> 
+<%- include('../admin/navbar.ejs')  %> 
+<%- include('../admin/sidebar.ejs')  %> 
+
+<main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>Edit product</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="index.html">Admin</a></li>
+          <li class="breadcrumb-item active">Current details</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+  
+    <div class="pagetitle">
+        <h1>Update product details</h1>
+      </div><!-- End Page Title -->
+
+    <section class="section">
+        <div class="row">
+          <div class="col-lg-12">
+  
+            <div class="card">
+              <div class="card-body">
+  
+                <!-- General Form Elements -->
+                
+                <form action="/admin/updateProduct" method="post"  > 
+                  <div class="row my-3 ">
+                    <label for="inputText" class="col-sm-2 col-form-label">Product name</label>
+                    <div class="col-sm-10">
+                      <input type="text"  name="name" value="<%= imageData.name %>" class="form-control input">
+                    </div>
+                  </div>
+                  <input type="text" name="test" value="hiiiiiiiiiiiii" class="d-none">
+                  <div class="row mb-3">
+                    <label for="inputPassword" class="col-sm-2 col-form-label">Price</label>
+                    <div class="col-sm-10">
+                      <input type="number"   name="price" value="<%= imageData.price %>" class="form-control input">
+                    </div>
+                  </div>
+                  <div class="row mb-3">
+                    <label for="inputNumber" class="col-sm-2 col-form-label">Number of products</label>
+                    <div class="col-sm-10">
+                      <input type="number"   name="stock" value="<%= imageData.stock %>" class="form-control input">
+                    </div>
+                  </div>
+
+                    <input type="text" name="proId" value="<%=imageData._id %>" class="d-none">
+
+                  <div class="row mb-3">
+                    <label for="inputNumber" class="col-sm-2 col-form-label">Images</label>
+                    <div class="col-sm-10">
+                      <!-- <input class="form-control" name="image" multiple type="file" id="formFile"> -->
+                      <div class="image-container ms-2 d-flex justify-content-even">
+                        <% imageData.images.forEach((data) =>{ %>
+                          <div class="img-wrapper">
+                            <img src="/product_images/<%= data %>" alt="" width="100px" height="100px">
+                          </div>
+                          <div class="btn" type="button" onclick='deleteProductImage("<%= imageData._id %>" , "<%= data %>")'>
+                            <a class="text-danger"><i class="fa fa-trash"></i></a>
+                          </div>
+                        <% }) %>
+                      </div>
+                      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#formModal">
+                        add image
+                      </button>
+                    </div>
+                  </div>
+  
+                  <div class="row mb-3">
+                    <label for="inputPassword" class="col-sm-2 col-form-label">Description</label>
+                    <div class="col-sm-10">
+                      <textarea class="form-control input" name="description" style="height: 100px"></textarea>
+                    </div>
+                  </div>
+                 
+                  <div class="row mb-3">
+                    <label class="col-sm-2 col-form-label">Select product category</label>
+                    <div class="col-sm-10">
+                      <select class="form-select input"  name="category" aria-label="Default select example">
+                        <option value="<%=imageData.category%>" selected ><%=imageData.categoryName%></option>
+                        <% categoryData.forEach(element =>{ %>
+                          <option value="<%= element._id%>">
+                          <%= element.name %>
+                        </option>
+                        <% }) %>
+                      </select>
+                    </div>
+                  </div>
+  
+                  <div class="row mb-3">
+                    <div class="col-sm-10">
+                      <button type="submit" class="btn btn-primary">Update details</button>
+                    </div>
+                  </div>
+  
+                </form><!-- form ends here -->
+
+                <!-- Modal -->
+                <div class="modal fade" id="formModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel">Add new product images</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body">
+
+                        <form action="/admin/updateProductImage" method="post" enctype="multipart/form-data" id="modalForm">
+                          <input type="file" accept="image/*" name="image" multiple>
+                          <input type="text" name="proId" value="<%=imageData._id %>" class="d-none">
+
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" id="modalButton" class="btn btn-primary">Add image</button>
+                          </div>
+
+                        </form>
+                        
+                      </div>
+                    </div>
+                  </div>
+                </div>
+  
+              </div>
+            </div>
+  
+          </div>
+  
+          
+        </div>
+      </section>
+  
+  </main><!-- End #main -->
+
+  <script>
+    function validateForm() {
+      let inputs = document.getElementsByClassName("input")
+
+      for(let i=0; i< inputs.length; i++){
+        if(inputs[i].value == ""){
+          alert("All fields are required!!")
+          return false;
+        }
+      }
+      return true;
+    }
+
+    function deleteProductImage(productId , imageName) {
+
+      console.log(productId , imageName);
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You want to delete the product?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes !'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: `/admin/deleteProductImage/${productId}/${imageName}` ,
+                    method: 'get',
+                    success: (response) => {
+                        Swal.fire({
+                            title: 'Deleted!',
+                            text: 'You have deleted the product!',
+                            icon: 'success',
+                            showConfirmButton: false
+                        })
+                        setTimeout(() => {
+                            location.reload()
+                        }, 1000);
+                    }
+                })
+            }
+        })
+    }
+
+    const modalButton = document.getElementById('modalButton')
+    modalButton.addEventListener('click' , (event) =>{
+      event.preventDefault()
+      const formData = new FormData(modalForm)
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST' , '/admin/updateProductImage')
+      xhr.send(formData)
+      xhr.onload = function(){
+        if(xhr.status === 200) {
+          const response = JSON.parse(xhr.responseText)
+          const modal = document.getElementById('formModal')
+          const modalInstance = bootstrap.Modal.getInstance(modal)
+          modalInstance.hide()
+          Swal.fire({
+            position: 'top-end',
+            icon: 'success',
+            title: 'Your work has been saved',
+            showConfirmButton: false,
+            timer: 1000
+          })
+          setTimeout(() =>{
+            location.reload()
+          }, 1000)          
+        }else{
+          console.error('Request failed. Error code:' , xhr.status)
+        }
+      }
+    })
+  </script>
+
+<%- include('../layout/admin/admin_footer.ejs')  %> 

@@ -1,0 +1,82 @@
+<%- include('../layout/user/user_login_header.ejs') %>
+
+
+<div class="container"  >
+
+    <div class="row" style="height: 100vh;">
+        
+        <div class="wrapper d-flex justify-content-center align-items-center">
+            <div class="col col-md-4 d-flex justify-content-center flex-column align-items-center">
+                <div class="heading1">
+                    <h3>OTP verification</h3>
+                </div>
+                <div class=" shadow-lg p-4">
+                    <div class="card text-center" style="width: 18rem;">
+                        <div class="card-body">
+                            <h5 class="card-title text-danger">Verify your mobile number</h5>
+                            <p class="card-text">Please enter the otp recieved in your phone</p>
+
+                            <% if(typeof message !== 'undefined') { %>
+                                <div class="alert alert-danger" role="alert">
+                                    <%= message %>
+                                    <p class="text-danger">Please try again</p>
+                                  </div>
+                            <% } %>
+                            <form method="post" action="/verifyOtp" id="otpForm" >
+        
+                                <div class="mb-3">
+                                    <label for="exampleInputPassword1" class="form-label text-danger">OTP</label>
+                                    <input type="text" class="border border-primary-subtle" name="otp" id="userOtp">
+                                </div>
+        
+                                <button type="submit" class="btn btn-primary">Verify OTP</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+
+</div>
+<script>
+    // function validateForm() {
+    //   let inputs = document.getElementsByTagName("input")
+
+    //   for(let i=0; i< inputs.length; i++){
+    //     if(inputs[i].value == ""){
+    //       alert("Please enter the OTP")
+    //       return false;
+    //     }
+    //   }
+    //   return true;
+    // }
+
+    // $('#otpForm').submit((event) =>{
+    //     event.preventDefault()
+    //     const otp = document.getElementById('userOtp').value
+    //     console.log(otp);
+    //     if(!otp){
+    //         $('#message').text('Please enter the OTP')
+    //         return
+    //     }
+    //     $.ajax({
+    //         type : 'POST',
+    //         url : '/verifyOtp',
+    //         data : {code : otp},
+    //         success : ((response) =>{
+    //             $('#alert').html(response.message)
+    //         }),
+    //         error : ((error) =>{
+    //             console.log(error);
+    //         })
+    //     })
+    // })
+  </script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+<%- include('../layout/user/user_login_footer.ejs') %>
+

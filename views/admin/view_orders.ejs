@@ -1,0 +1,91 @@
+<%- include('../layout/admin/admin_header.ejs')  %> 
+<%- include('../admin/navbar.ejs')  %> 
+<%- include('../admin/sidebar.ejs')  %> 
+
+<main id="main" class="main">
+
+  <div class="pagetitle">
+    <h1>General Tables</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+        <li class="breadcrumb-item">Tables</li>
+        <li class="breadcrumb-item active">General</li>
+      </ol>
+    </nav>
+  </div><!-- End Page Title -->
+
+  <section class="section">
+    <div class="row">
+
+      <div class="col-lg-12">
+
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Table with stripped rows</h5>
+
+            <!-- Table with stripped rows -->
+            <table class="table table-striped">
+              <thead>
+                 <tr>
+                   <th scope="col">No</th>
+                   <th scope="col">Order id</th> 
+                   <th scope="col">User name</th>
+                   <th scope="col">Delivery Address</th>
+                   <th scope="col">Products</th>
+                   <th scope="col">Quantity</th>
+                   <th scope="col">Price</th>
+                   <th scope="col">Total amount</th>
+                   <th scope="col">Bill amount</th>
+                   <th scope="col">Payment method</th>
+                   <th scope="col">Status</th>
+                 </tr>
+                
+              </thead>
+              <tbody>
+                <% for(let i = 0; i<orderDetails.length; i++){ %>
+                  <% const product = orderDetails[i].product %>
+                    <tr>
+                      <th scope="row"><%= i+1 %></th>
+                      <td><%= orderDetails[i].orderId %></td>
+                      <td><%= orderDetails[i].userId.userName %></td>
+                      <td><%= orderDetails[i].deliveryAddress %></td>
+                      <td><% for(let j = 0; j<product.length ; j++){ %>
+                        <p><%= product[j].productId.name %></p>
+                      <% } %>
+                      </td>
+                      <td><% for(let j = 0; j<product.length ; j++){ %>
+                        <p><%= product[j].quantity %> </p><br>
+                      <% } %> 
+                      </td>
+                      <td><% for(let j = 0; j<product.length ; j++){ %>
+                        <p><%= product[j].price %> </p><br>
+                      <% } %> 
+                      </td>
+                      <td><% for(let j = 0; j<product.length ; j++){ %>
+                        <p><%= product[j].productTotalAmount %> </p><br>
+                      <% } %> 
+                      </td>
+                      <td><%= orderDetails[i].total %></td>
+                      <td><%= orderDetails[i].paymentType %></td>
+                      <td><%= orderDetails[i].status %></td>
+                    </tr>
+                  
+                <% } %>
+              </tbody>
+            </table>
+            <!-- End Table with stripped rows -->
+
+          </div>
+        </div>
+      </div>
+    
+  </section>
+
+</main><!-- End #main -->
+
+
+
+
+
+<%- include('../layout/admin/admin_footer.ejs')  %> 

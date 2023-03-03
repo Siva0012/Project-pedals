@@ -1,0 +1,151 @@
+<%- include('../layout/user/user_login_header.ejs') %>
+
+    <div class="containerfluid">
+
+        <div class="background d-flex flex-column align-items-center justify-content-center"
+            style="background-color: rgb(241, 239, 239);  height:100vh ;">
+
+            <div class="heading text-black mb-4">
+                <h1 class="text-success">Register your account here</h1>
+            </div>
+            <div class="container">
+
+                <div class="row">
+
+                    <div class="col col-md-6 align-self-start" style="color: rgb(118, 140, 220);">
+
+                        <h2 class="h2">Welcome!</h2>
+                        <div ><h2 id="message" class="text-danger"></h2></div>
+                        
+
+                    </div>
+
+
+
+                    <div class="col col-md-6 align-self-end">
+
+                        <div class="form-container d-flex flex-column">
+
+                            <div class="content-wrapper border border-3 border-primary rounded-4 p-4">
+
+                                <form class="text-black" action="/userSignup" id="myForm" method="post" >
+                                    <div class="mb-3">
+
+                                        <label for="exampleInputEmail1" class="form-label">Enter your first name</label>
+                                        <input type="text" name="firstName" class="form-control border-primary-subtle" id="firstName">
+
+                                    </div>
+                                    <div class="mb-3">
+
+                                        <label for="exampleInputEmail1" class="form-label">Enter your last name</label>
+                                        <input type="text" name="lastName" class="form-control border-primary-subtle" id="lastName">
+
+                                    </div>
+                                    <div class="mb-3">
+
+                                        <label for="exampleInputEmail1" class="form-label">Enter your user name</label>
+                                        <input type="text" name="userName" class="form-control border-primary-subtle" id="userName">
+
+                                    </div>
+                                    <div class="mb-3">
+
+                                        <label for="exampleInputEmail1" class="form-label">Enter your Email</label>
+                                        <input type="email" name="email" class="form-control border-primary-subtle" id="email">
+
+                                    </div>
+                                    <div class="mb-3">
+
+                                        <label for="exampleInputEmail1" class="form-label">Enter your phone numer</label>
+                                        <input type="text" name="phone" class="form-control border-primary-subtle" id="phone">
+
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="exampleInputPassword1" class="form-label">Enter your password</label>
+                                        <input type="password" name="password" class="form-control border-primary-subtle"
+                                        id="password">
+                                    </div>
+
+
+                                    <button type="submit" class="btn btn-primary align-self-center">Sign me up</button>
+
+                                    
+                                </form>
+
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // function validateForm() {
+        //   let inputs = document.getElementsByTagName("input")
+  
+        //   for(let i=0; i< inputs.length; i++){
+        //     if(inputs[i].value == ""){
+        //       alert("All fields are required!!")
+        //       return false;
+        //     }
+        //   }
+        //   return true;
+        // }
+
+        // const form = document.querySelector('#myForm');
+        // const errorMessage = document.querySelector('#error-message');
+
+        // form.addEventListener('submit', (event) => {
+        // if (!form.checkValidity()) {
+        // event.preventDefault(); // Prevent form submission
+        // errorMessage.innerHTML = 'Please fill out all fields'; // Display error message
+        // }
+        // });
+       
+            const form = document.getElementById("myForm");
+            const message = document.getElementById("message");
+            const inputs = form.querySelectorAll('input')
+
+            form.addEventListener("submit", function (event) {
+                event.preventDefault(); // prevent page from reloading
+
+                const firstNameInput = document.getElementById("firstName");
+                const lastNameInput = document.getElementById('lastName')
+                const userNameInput = document.getElementById('userName')
+                const emailInput = document.getElementById('email')
+                const phoneInput = document.getElementById('phone')
+                const passwordInput = document.getElementById('password')
+
+                const firstName = firstNameInput.value.trim();
+                const lastName = lastNameInput.value.trim();
+                const userName = userNameInput.value.trim();
+                const email = emailInput.value.trim();
+                const phone = phoneInput.value.trim();
+                const password = passwordInput.value.trim();
+
+                if (firstName === "" || lastName === '' || userName === '' || email === '' || phone === '' ||password === '') {
+                    message.innerText = "All fields are required!";
+                    // firstNameInput.focus();
+                    inputs.forEach((input) =>{
+                        input.focus()
+                    })
+                    
+                    setTimeout(() =>{
+                        message.innerText = ''
+                    } , 1000)
+                    return;
+                }
+
+                // submit the form if everything is valid
+                form.submit();
+            });
+
+
+      </script>
+
+    <%- include('../layout/user/user_login_footer.ejs') %>
