@@ -3,8 +3,8 @@
 
 
 
-<section style="background-color: #eee;">
-    <div class="container py-5">
+<section style="background-color: #eee;" >
+    <div class="container py-5" id="reloadSection">
       <div class="row">
         <div class="col">
           <nav aria-label="breadcrumb" class="bg-light rounded-3 p-3 mb-4">
@@ -24,12 +24,6 @@
             <div class="card-body text-center">
               <h5 class="my-3">Hi</h5>
               <h5 class="my-3"><%= userData.userName %></h5>
-              <!-- <p class="text-muted mb-1">Full Stack Developer</p>
-              <p class="text-muted mb-4">Bay Area, San Francisco, CA</p> -->
-              <div class="d-flex justify-content-center mb-2">
-                <button type="button" class="btn btn-primary">Follow</button>
-                <button type="button" class="btn btn-outline-primary ms-1">Message</button>
-              </div>
             </div>
           </div>
           <div class="card mb-4 mb-lg-0">
@@ -38,7 +32,7 @@
               <div class="row">
                   <div class="col p-2">
                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-                      Launch demo modal
+                      Change password
                     </button>
                   </div>
               </div>
@@ -86,11 +80,14 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
               <div class="modal-body">
+
                 <form action="/changePassword" method="post" id="passForm">
 
                   <div class="mb-3">
-                    <label for="exampleInputEmail1" class="form-label">Current password</label>
-                    <input type="password" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="currentPassword">
+                    <label for="currentPasswordId" class="form-label">Current password</label>
+                    <input type="password" class="form-control" id="currentPasswordId" aria-describedby="emailHelp" name="currentPassword">
+                    <label for="showCheckbox">show password</label>
+                    <input type="checkbox" class="" id="showCheckbox" onchange="changeVisibiliy()">
                   </div>
                   <div class="mb-3">
                     <label for="exampleInputPassword1" class="form-label">New password</label>
@@ -107,8 +104,8 @@
                   </div>
 
                 </form>
-                <div class="alert alert-warning" role="alert" style="display: none;">
-                  A simple warning alert—check it out!
+                <div class="alert alert-warning" role="alert" style="display: none;" id="errorAlert">
+                  
                 </div>
                 
               </div>
@@ -169,74 +166,7 @@
                     </div>
                   </div>                
           
-          <!-- <div class="row">
-            <div class="col-md-6">
-              <div class="card mb-4 mb-md-0">
-                <div class="card-body">
-                  <p class="mb-4"><span class="text-primary font-italic me-1">assigment</span> Project Status
-                  </p>
-                  <p class="mb-1" style="font-size: .77rem;">Web Design</p>
-                  <div class="progress rounded" style="height: 5px;">
-                    <div class="progress-bar" role="progressbar" style="width: 80%" aria-valuenow="80"
-                      aria-valuemin="0" aria-valuemax="100"></div>
-                  </div>
-                  <p class="mt-4 mb-1" style="font-size: .77rem;">Website Markup</p>
-                  <div class="progress rounded" style="height: 5px;">
-                    <div class="progress-bar" role="progressbar" style="width: 72%" aria-valuenow="72"
-                      aria-valuemin="0" aria-valuemax="100"></div>
-                  </div>
-                  <p class="mt-4 mb-1" style="font-size: .77rem;">One Page</p>
-                  <div class="progress rounded" style="height: 5px;">
-                    <div class="progress-bar" role="progressbar" style="width: 89%" aria-valuenow="89"
-                      aria-valuemin="0" aria-valuemax="100"></div>
-                  </div>
-                  <p class="mt-4 mb-1" style="font-size: .77rem;">Mobile Template</p>
-                  <div class="progress rounded" style="height: 5px;">
-                    <div class="progress-bar" role="progressbar" style="width: 55%" aria-valuenow="55"
-                      aria-valuemin="0" aria-valuemax="100"></div>
-                  </div>
-                  <p class="mt-4 mb-1" style="font-size: .77rem;">Backend API</p>
-                  <div class="progress rounded mb-2" style="height: 5px;">
-                    <div class="progress-bar" role="progressbar" style="width: 66%" aria-valuenow="66"
-                      aria-valuemin="0" aria-valuemax="100"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-6">
-              <div class="card mb-4 mb-md-0">
-                <div class="card-body">
-                  <p class="mb-4"><span class="text-primary font-italic me-1">assigment</span> Project Status
-                  </p>
-                  <p class="mb-1" style="font-size: .77rem;">Web Design</p>
-                  <div class="progress rounded" style="height: 5px;">
-                    <div class="progress-bar" role="progressbar" style="width: 80%" aria-valuenow="80"
-                      aria-valuemin="0" aria-valuemax="100"></div>
-                  </div>
-                  <p class="mt-4 mb-1" style="font-size: .77rem;">Website Markup</p>
-                  <div class="progress rounded" style="height: 5px;">
-                    <div class="progress-bar" role="progressbar" style="width: 72%" aria-valuenow="72"
-                      aria-valuemin="0" aria-valuemax="100"></div>
-                  </div>
-                  <p class="mt-4 mb-1" style="font-size: .77rem;">One Page</p>
-                  <div class="progress rounded" style="height: 5px;">
-                    <div class="progress-bar" role="progressbar" style="width: 89%" aria-valuenow="89"
-                      aria-valuemin="0" aria-valuemax="100"></div>
-                  </div>
-                  <p class="mt-4 mb-1" style="font-size: .77rem;">Mobile Template</p>
-                  <div class="progress rounded" style="height: 5px;">
-                    <div class="progress-bar" role="progressbar" style="width: 55%" aria-valuenow="55"
-                      aria-valuemin="0" aria-valuemax="100"></div>
-                  </div>
-                  <p class="mt-4 mb-1" style="font-size: .77rem;">Backend API</p>
-                  <div class="progress rounded mb-2" style="height: 5px;">
-                    <div class="progress-bar" role="progressbar" style="width: 66%" aria-valuenow="66"
-                      aria-valuemin="0" aria-valuemax="100"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div> -->
+          
         </div>
         
         
@@ -246,15 +176,73 @@
 
   <script>
 
+    $(document).ready(() =>{
+      const inputs = document.querySelectorAll('form input')
+      console.log('this is inputs' , inputs);
+      
+    })
+
+    function changeVisibiliy () {
+      const input = document.getElementById('currentPasswordId')
+      console.log('this is input in change' , input);
+      const checkboxButton = document.getElementById('showCheckbox')
+      if(checkboxButton.checked){
+        input.type = 'text'
+      }else{
+        input.type = 'password'
+      }
+    }
+
     const form = document.getElementById('passForm')
     form.addEventListener('submit' , (event) =>{
       event.preventDefault()
-      fetch('/changePassword')
-      .then((response) =>{
-        console.log("this is response from server" , response);
-      })
+      const inputs = document.querySelectorAll('form input')
+      let nullField = false
+      for(let i = 0 ; i < inputs.length; i ++){
+        if(inputs[i].value == ""){
+          nullField = true
+          $('#errorAlert').attr({style : 'display : block ; color : red'}).html("Please fill all the fields")
+          setTimeout(() =>{
+            $('#errorAlert').hide()
+          } , 2000)
+        }
+      }
+      if(!nullField){
+        console.log(`form submitted`)
+        const formData = new FormData(form)
+        const url = '/changePassword'
+        fetch(url ,
+          {
+            method : 'POST',
+            headers : {'Content-Type' : 'application/json'},
+            body : JSON.stringify(Object.fromEntries(formData)),
+          }
+        )
+        .then(async (response) =>{
+          const data = await response.json()
+          if(data.message){
+            
+            Swal.fire({
+              position: 'bottom-end',
+              icon: 'success',
+              title: data.message,
+              showConfirmButton: false,
+              timer: 2000
+            })
+            form.reset()
+            $('#exampleModal').modal('hide')
+          }else{
+            $('#errorAlert').attr({style : 'display : block'}).html(data.error)
+            setTimeout(() =>{
+              $('#errorAlert').hide()
+            } , 1500)
+          }
+        })
+        .catch((error) =>{
+          console.log(error);
+        })
+      }
     })
-
     
   </script>
 

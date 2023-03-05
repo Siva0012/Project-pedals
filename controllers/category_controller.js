@@ -14,8 +14,9 @@ const insertCategory = async (req , res , next) =>{
         const existsCat = await Categories.findOne({name : {$regex : new RegExp( catName , "i" )}})
         
         if(existsCat){
-            res.render('add_categories' , {dupError : 'Category already exists'})
-            dupError = undefined
+            // res.render('add_categories' , {dupError : 'Category already exists'})
+            // dupError = undefined
+            res.json({error : 'Category already exists!!' })
         }else{
             const category = new Categories(
                 {
@@ -26,10 +27,12 @@ const insertCategory = async (req , res , next) =>{
             const categoryData = await category.save()/* Saving document to database*/
             if(categoryData){
 
-                res.redirect('/admin/viewcategories')
+                // res.redirect('/admin/viewcategories')
+                res.json({message : `'${catName}' added successfully!`})
                 
             }else{
-                res.redirect('/admin/viewcategories')
+                // res.redirect('/admin/viewcategories')
+                res.json({error : `Error occured while adding category!`})
             }
         }
         

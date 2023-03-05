@@ -22,23 +22,20 @@
 
         <div class="card">
           <div class="card-body">
-            <h5 class="card-title">Table with stripped rows</h5>
+            <h5 class="card-title">Order details</h5>
 
             <!-- Table with stripped rows -->
-            <table class="table table-striped">
+            <table class="table table-bordered border-primary">
               <thead>
                  <tr>
                    <th scope="col">No</th>
                    <th scope="col">Order id</th> 
                    <th scope="col">User name</th>
-                   <th scope="col">Delivery Address</th>
                    <th scope="col">Products</th>
-                   <th scope="col">Quantity</th>
-                   <th scope="col">Price</th>
-                   <th scope="col">Total amount</th>
                    <th scope="col">Bill amount</th>
                    <th scope="col">Payment method</th>
                    <th scope="col">Status</th>
+                   <th scope="col">Action</th>
                  </tr>
                 
               </thead>
@@ -47,30 +44,36 @@
                   <% const product = orderDetails[i].product %>
                     <tr>
                       <th scope="row"><%= i+1 %></th>
+
                       <td><%= orderDetails[i].orderId %></td>
+
                       <td><%= orderDetails[i].userId.userName %></td>
-                      <td><%= orderDetails[i].deliveryAddress %></td>
+
                       <td><% for(let j = 0; j<product.length ; j++){ %>
-                        <p><%= product[j].productId.name %></p>
+                        <ul>
+                          <li>
+                            <p><%= product[j].productId.name %></p>
+                          </li>
+                        </ul>
                       <% } %>
                       </td>
-                      <td><% for(let j = 0; j<product.length ; j++){ %>
-                        <p><%= product[j].quantity %> </p><br>
-                      <% } %> 
-                      </td>
-                      <td><% for(let j = 0; j<product.length ; j++){ %>
-                        <p><%= product[j].price %> </p><br>
-                      <% } %> 
-                      </td>
-                      <td><% for(let j = 0; j<product.length ; j++){ %>
-                        <p><%= product[j].productTotalAmount %> </p><br>
-                      <% } %> 
-                      </td>
+
                       <td><%= orderDetails[i].total %></td>
+
                       <td><%= orderDetails[i].paymentType %></td>
+
                       <td><%= orderDetails[i].status %></td>
+
+                      <td>
+                        <div class="button-wrapper d-flex flex-column align-items-between">
+                          <a href="/admin/viewSingleOrder/<%= orderDetails[i]._id %>">
+                            <button class="btn btn-primary mb-3" type="button">view</button>
+                          </a>
+                          <button class="btn btn-warning">Cancel</button>
+                        </div>
+                      </td>
                     </tr>
-                  
+
                 <% } %>
               </tbody>
             </table>

@@ -3,6 +3,7 @@ const Users = require('../models/user_model')
 const Category = require('../models/category_model')
 const Banners = require('../models/banner_model')
 const Orders = require('../models/order_model')
+const Coupons = require('../models/coupons_model')
 const session = require('express-session')
 const bcrypt = require('bcrypt')
 const { v4: uuidv4 } = require('uuid');
@@ -319,8 +320,6 @@ const addToCart = async (req , res , next) =>{
                 {_id : userId},
                 {$push : {cart : {productId : proId , totalProductAmount : productData.price}}}
                 )
-          
-
             
             res.redirect('/viewCart')
         }else{
@@ -409,9 +408,11 @@ const changePassword = async (req , res , next) =>{
                     if(status){
                         const password = await bcrypt.hash(newPassword , 10)
                         await Users.updateOne({ _id : userId} , {$set : {password : password}})
-                        res.redirect('/userProfile')
+                        console.log('password changed successfully');
+                        res.json({message : 'password changed successfully'})
                     }else{
                         console.log('password not matching');
+                        res.json({error : 'You entered wrong current password'})
                     }
                 })
             })
@@ -667,6 +668,84 @@ const placeOrder = async (req , res , next) =>{
     }
 }
 
+const redeemCoupon = async (req , res , next) =>{
+
+    try{
+        
+        
+        const userId = req.session.user_id
+        const couponCode = req.body.couponCode
+        const userData = await Users.findOne({ _id : userId})
+        const coupon = await Coupons.findOne({couponCode : couponCode});
+
+        /*------coupon checking parameters-----*/
+        const totalCartAmount = userData.totalCartAmount
+        console.log('this is userData in redeem coupon' , userData);
+        console.log('this is totalcartAmount in redeem coupon' , totalCartAmount);
+        const currentDate = new Date()
+        if(!coupon){
+            console.log('no coupon exists');
+            return res.json({error : 'No coupon exists!!!'})
+            // return res.json({message : 'No coupon exists!!!'})
+        }else{
+            const expiryDate = coupon.expiryDate
+            const minPurchaseAmount = coupon.minPurchaseAmount
+            const maxDiscountPercentage = coupon.percentageDiscount / 100
+            const maxDiscountAmount = coupon.maxDiscount
+            const isClaimed = await Coupons.findOne({ couponCode : couponCode, claimedUsers: {$elemMatch: {userId: userId}}});
+            if(isClaimed){
+                console.log('already claimed');
+                return res.json({claimed : 'Already claimed'})
+                // return res.json({message : 'Already claimed'})
+            }else{
+                console.log('Not claimed');
+                if(currentDate.getDate() <= expiryDate.getDate()){
+                    console.log('data is ok');
+                    if(totalCartAmount >= minPurchaseAmount){
+
+                        const availableDiscountAmount = totalCartAmount * maxDiscountPercentage
+                        console.log('this is availabledicountAmount ' ,typeof availableDiscountAmount , availableDiscountAmount);
+                        let discountGained
+                        if(availableDiscountAmount >= maxDiscountAmount){
+                            discountGained = maxDiscountAmount
+                            console.log('this is greater than disounct amount' , discountGained);
+                        }else{
+                            discountGained = availableDiscountAmount
+                            console.log('this is lesser discount amount' , discountGained);
+                        }
+                        const oldCartAmount = totalCartAmount
+                        console.log('this is oldcartamount ' , oldCartAmount);
+                        const newTotalCartAmount = totalCartAmount - discountGained
+                        console.log('this is cartamount after discount' , newTotalCartAmount);
+                        const updateResponse = await Users.updateOne({ _id : userId} , {$set : {totalCartAmount : newTotalCartAmount}})
+                        console.log('this is updated totalcart amount in user' , updateResponse);
+                        await Users.findOne({ _id: userId})
+                        .then((response) =>{
+                            console.log('this is response.totalcart amount after updation' , response);
+                        })
+                        const couponClaimed = await Coupons.updateOne({couponCode : couponCode} , {$push : {claimedUsers : {userId : userId}}})
+                        if(couponClaimed){
+                            console.log('coupon applied');
+                            return res.json({message : 'Coupon applied!' , oldCartAmount : oldCartAmount , newTotalCartAmount : newTotalCartAmount})
+                        }
+
+                    }else{
+                        console.log('minimum purchase amount is insufficient');
+                        return res.json({minimumAmount : `Minimum purchase amount is Rs.${minPurchaseAmount}`})
+                    }
+                }else{
+                    console.log('the coupon has expired');
+                    return res.json({couponExpired: 'The coupon has expired!'})
+                }
+
+            }
+        }
+    }catch(error){
+        next(error)
+        console.log(error.message);
+    }
+}
+
 module.exports = {
     viewUserLogin,
     viewUserHome,
@@ -689,5 +768,6 @@ module.exports = {
     editAddress,
     viewCheckoutPage,
     placeOrder,
-    changePassword
+    changePassword,
+    redeemCoupon
 }

@@ -54,5 +54,7 @@ user_router.get('/viewCheckoutPage' , userController.viewCheckoutPage)
 
 user_router.post('/placeOrder' , userController.placeOrder)
 
+user_router.post('/redeemCoupon' , userController.redeemCoupon)
+
 
 module.exports = user_router

@@ -23,7 +23,7 @@
             <div class="card-body">
 
               <!-- General Form Elements -->
-              <form action="/admin/insertCategory" id="#myForm" method="post"> 
+              <form action="/admin/insertCategory" id="myForm" method="post"> 
 
                 <div class="row my-3 ">
                   
@@ -48,10 +48,9 @@
                   </div>
                 </div>
 
-                <div class="row">
-                  <div id="alertDiv" class="alert alert-danger" role="alert" style="display: none;">
-                    <h4 class="text-danger" id="message"></h4>
-                  </div>
+
+                <div class="alert alert-warning" role="alert" style="display: none;" id="errorAlert">
+                  
                 </div>
                 
               </form><!-- form ends here -->
@@ -70,7 +69,57 @@
   </main><!-- End #main -->
 
   <script>
+    const form = document.getElementById('myForm')
+    const inputs = form.querySelectorAll('input')
+    form.addEventListener('submit', (event) => {
+      event.preventDefault()
 
+      /*-----checking null fields-----*/
+      let nullField = false
+      for (let i = 0; i < inputs.length; i++) {
+        if (inputs[i].value == "") {
+          nullField = true
+        }
+      }
+      if (nullField) {
+        $('#errorAlert').attr({ style: 'display : block ; color : red' }).html('All fields required!!')
+        setTimeout(() => {
+          $('#errorAlert').fadeOut('slow')
+        }, 2000)
+      }else{
+        /*----submitting form----*/
+        const url = '/admin/insertCategory'
+        const data = new FormData(form)
+        console.log(data);
+        fetch(url,
+        {
+          method : 'post',
+          headers : {'Content-Type' : 'application/json'},
+          body : JSON.stringify(Object.fromEntries(data))
+        })
+        .then(async (response) =>{
+          const data = await response.json()
+          console.log('this is promise datga' , data);
+          if(data.message){
+            Swal.fire({
+                position: 'top-end',
+                icon: 'success',
+                title: data.message,
+                showConfirmButton: false,
+                timer: 2000
+              })
+              setTimeout(() =>{
+                location.href = '/admin/viewCategories'
+              } , 2200)
+          }else{
+            $('#errorAlert').attr({ style : 'display : block ; color : red'}).html(data.error)
+            setTimeout(() =>{
+              $('#errorAlert').fadeOut('slow')
+            } , 1200)
+          }
+        })
+      }
+    })
   </script>
 
 

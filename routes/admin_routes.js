@@ -66,4 +66,9 @@ admin_router.get('/viewOrders' , adminController.viewOrders)
 
 admin_router.post('/updateProductImage' , upload.array('image' , 4) , productController.updateProductImage)
 
+admin_router.get('/viewCoupons' , adminController.viewCoupons)
+
+admin_router.post('/addCoupon' , adminController.addCoupon)
+
+admin_router.get('/viewSingleOrder/:orderId' , adminController.viewSingleOrder)
 module.exports = admin_router

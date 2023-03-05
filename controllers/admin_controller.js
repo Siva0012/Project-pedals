@@ -3,6 +3,8 @@ const Products = require('../models/products_model')
 const Categories = require('../models/category_model')
 const Users = require('../models/user_model')
 const Orders = require('../models/order_model')
+const Coupons = require('../models/coupons_model')
+const moment = require('moment')
 
 
 /*------------loads admin login page------------*/
@@ -161,8 +163,67 @@ const viewOrders = async (req , res , next) =>{
     }
 }
 
+/*-------view single order--------*/
+const viewSingleOrder = async (req , res , next) =>{
+
+    try{
+        const orderId =  req.params.orderId
+        console.log('this is orderId in viewSingleOrderrr' , orderId);
+
+        const orderData = await Orders.findOne({ _id : orderId}).populate('product.productId').populate('userId')
+        console.log('this is the orderData in viewSingleOrder' , orderData);
+        res.render('view_single_order' , {orderData : orderData , moment : moment})
+    }catch(error){
+        next(error)
+        console.log(error.message);
+    }
+}
+
+
+const viewCoupons = async (req , res , next) =>{
+
+    try{
+
+        await Coupons.find()
+        .then((response) =>{
+            res.render('view_coupons' , {couponData : response , moment : moment})
+        })
+
+    }catch(error){
+        next(error)
+        console.log(error.message);
+    }
+}
+
+const addCoupon = async (req , res , next) =>{
+
+    try{
+        const{couponCode , expiryDate , maxDiscount , minPurchaseAmount , percentageDiscount} = req.body
+        console.log('this is req.body in server side' , req.body);
+
+        const newCoupon = new Coupons( {
+            couponCode : couponCode,
+            expiryDate : expiryDate,
+            percentageDiscount : percentageDiscount,
+            maxDiscount : maxDiscount,
+            minPurchaseAmount : minPurchaseAmount,
+            percentageDiscount : percentageDiscount
+        })
+
+        await newCoupon.save()
+        .then((response) =>{
+            console.log('Successfully added new coupon' , response);
+        })
+
+        res.json({response : 'got req body here'})
+    }catch(error){
+        next(error)
+        console.log(error.message);
+    }
+}
 
 
 
-module.exports = {adminLogin , adminVerify , adminPanel , viewUsers , blockUser , unblockUser , addCategory ,addProducts , unlistProduct , listProduct , viewOrders}
+
+module.exports = {adminLogin , adminVerify , adminPanel , viewUsers , blockUser , unblockUser , addCategory ,addProducts , unlistProduct , listProduct , viewOrders , viewCoupons , addCoupon , viewSingleOrder}
 

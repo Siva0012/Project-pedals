@@ -1,0 +1,176 @@
+<%- include('../layout/admin/admin_header.ejs')  %> 
+<%- include('../admin/navbar.ejs')  %> 
+<%- include('../admin/sidebar.ejs')  %> 
+
+
+
+<main id="main" class="main">
+
+    <div class="pagetitle">
+        <h1>Coupons</h1>
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="index.html">Admin</a></li>
+                <li class="breadcrumb-item active">Coupons</li>
+            </ol>
+        </nav>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCouponModal">
+            Add new coupon
+        </button>
+          
+    </div><!-- End Page Title -->
+
+    <section class="section" id="reloadSection">
+        <div class="row">
+            <div class="col-lg-12">
+
+                <div class="card">
+                    <div class="card-body">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr class="text-center align-middle">
+                                    <th scope="col">No</th>
+                                    <th scope="col">coupon code</th>
+                                    <th scope="col">Expiry date</th>
+                                    <th scope="col">Minimum purchase amount</th>
+                                    <th scope="col">Maximum discount amount</th>
+                                    <th scope="col">Percentage discount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% couponData.forEach((couponData , i) =>{ %>
+                                    <tr class="text-center align-middle">
+                                        <th scope="row"><%= i + 1 %></th>
+                                        <td><%= couponData.couponCode %></td>
+                                        <% const date = couponData.expiryDate %>
+                                        <td><%=moment(date).format('MMMM Do YYYY, h:mm:ss a') %> </td>
+                                        <td><%= couponData.minPurchaseAmount %></td>
+                                        <td><%=couponData.maxDiscount %></td>
+                                        <td><%=couponData.percentageDiscount %></td>
+                                    </tr>
+                                <% }) %>
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+        <!-- Modal -->
+        <div class="modal fade" id="addCouponModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel">Add coupon</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+
+                        <form class="row g-3" id="couponForm" action="/admin/addCoupon" method="POST">
+                            <div class="col-md-6">
+                                <label for="couponCode" class="form-label">Coupon code</label>
+                                <input type="text" class="form-control" id="couponCode" name="couponCode">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="expiryDate" class="form-label">Expiry date</label>
+                                <input type="date" class="form-control" id="expiryDate" name="expiryDate">
+                            </div>
+                            <div class="col-12">
+                                <label for="maxDiscount" class="form-label">Maximum discount</label>
+                                <input type="text" class="form-control" id="maxDiscount" name="maxDiscount">
+                            </div>
+                            <div class="col-12">
+                                <label for="minPurchaseAmount" class="form-label">Minimum purchase amount</label>
+                                <input type="text" class="form-control" id="minPurchaseAmount" name="minPurchaseAmount">
+                            </div>
+                            <div class="col-12">
+                                <label for="percentageDiscount" class="form-label">Percentage Discount</label>
+                                <input type="text" class="form-control" id="percentageDiscount" name="percentageDiscount">
+                            </div>
+                            <!-- <div class="col-12">
+                                <button type="submit" class="btn btn-primary">Add coupon</button>
+                            </div> -->
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-primary">Add coupon</button>
+                            </div>
+                        </form>
+
+                        <div class="alert alert-warning" role="alert" id="alertDiv" style="display: none;">
+
+                        </div>
+                          
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+</main><!-- End #main -->
+
+<script>
+    
+    const form = document.getElementById('couponForm')
+    const inputs = form.querySelectorAll('input')
+    
+    form.addEventListener('submit' , (event) =>{
+        event.preventDefault()
+        let nullFields = false
+        for(let i = 0; i < inputs.length; i ++){
+            if (inputs[i].value == "") {
+                nullFields = true
+                $('#alertDiv').show().html("All fields are required!!")
+                setTimeout(() => {
+                    $('#alertDiv').fadeOut('slow')
+                }, 1500)
+                break
+            }
+        }
+        console.log('checked nullfields ');
+        /*------Empty fields checking------*/
+        if(!nullFields){
+            console.log('entering  to false case');
+            const url = '/admin/addCoupon'
+            const formData = new FormData(form)
+            fetch(url,
+                {
+                    method : 'post',
+                    headers : {'Content-Type' : 'application/json'},
+                    body : JSON.stringify(Object.fromEntries(formData))
+                }
+            )
+            .then(async (response) =>{
+                const message = await response.json()
+                console.log('this is response in fetchhhh' , message.response);
+                Swal.fire({
+                position: 'bottom-end',
+                icon: 'success',
+                title: message.response,
+                showConfirmButton: false,
+                timer: 2000
+                })
+                
+                $('#reloadSection').load('/admin/viewCoupons #reloadSection')
+                $('#addCouponModal').modal('hide')
+            })
+            
+        }
+    })
+
+    /*------Preventing the escape closing of modal-----*/
+    $(document).ready(function () {
+        $('#addCouponModal').modal({
+            backdrop: 'static',
+            keyboard: false
+        });
+    });
+ 
+    
+</script>
+
+
+
+<%- include('../layout/admin/admin_footer.ejs')  %>
