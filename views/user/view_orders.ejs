@@ -1,0 +1,191 @@
+<%- include('../layout/user/user_header.ejs') %>
+    <%- include('../user/user_nav.ejs') %>
+
+
+    <% const inFormat = new Intl.NumberFormat('en-IN' , {style : 'currency' , currency : 'INR'}) %>
+    
+        <section class="h-100 gradient-custom" id="reloadDiv">
+            <div class="container py-5 h-100">
+                <div class="row d-flex justify-content-center align-items-center h-100">
+                    <div class="col-lg-10 col-xl-8">
+                        <div class="card" style="border-radius: 10px;">
+                            <div class="card-header px-4 py-5">
+                                <h5 class="text-muted mb-0">Your orders <span style="color: #a8729a;"></span>!</h5>
+                            </div>
+                            <div class="card-body p-4">
+
+                                <% orderData.forEach((data) =>{ %>
+                                                
+                                    <% const product = data.product %>
+
+                                    <div class="card shadow-0 border mb-4">
+                                        <div class="card-body shadow">
+                                                
+                                    <% product.forEach((product) =>{ %>
+                                                
+                                                <div class="row mb-3 shadow-sm">
+                                                    <div class="col-md-2">
+                                                        <img src="/product_images/<%= product.productId.images[0] %>"
+                                                            class="img-fluid" alt="Phone">
+                                                    </div>
+                                                    <div
+                                                        class="col-md-1 text-center d-flex justify-content-center align-items-center">
+                                                        <p class="text-muted fw-semibold mb-0"><%= product.productId.name %></p>
+                                                    </div>
+                                                    <div
+                                                        class="col-md-1 text-center d-flex justify-content-center align-items-center">
+                                                        <p class="text-muted mb-0 small"><%= product.quantity %> </p>
+                                                    </div>
+                                                    <div
+                                                        class="col-md-1 text-center d-flex justify-content-center align-items-center">
+                                                        <p class=" mb-0 small"> Ordered on <span class="text-success"><%= moment(data.date).format('MMMM Do YYYY') %></span> </p>
+                                                    </div>
+                                                    <div
+                                                        class="col-md-1 text-center d-flex justify-content-center align-items-center">
+                                                        <% const price = product.price %>
+                                                        <p class="text-muted fw-semibold mb-0 small"><%= inFormat.format(price) %></p>
+                                                    </div>
+
+                                                    
+                                                    <div class="col-md-3 text-center d-flex justify-content-center align-items-center productStatus">
+                                                        <p class="text-muted mb-0 small"><%= data.status %></p>
+                                                    </div>
+                                                    
+                                                                                                        
+                                                    <% if (product.orderStatus === "delivered") { %>
+                                                        <div class="col-md-3 text-center d-flex flex-column justify-content-around align-items-center productStatus">
+                                                            <p class="text-muted mb-0 small"><%= product.orderStatus %> on <span class="text-success"><%= moment(data.deliveredDate).format('MMMM Do YYYY, h:mm:ss a') %></span> </p>
+                                                            <a href="/returnRequest/<%= data._id %>" >
+                                                                <button id="returnButton" type="click" class="btn btn-warning"><span id="returnSpan" >Return</span></button>
+                                                                <p class="d-none" id="paraId"><%= data._id %></p>
+                                                                <p class="d-none" id="proId"><%= product.productId._id  %></p>
+                                                            </a>
+                                                        </div>
+                                                    <% } else if(product.orderStatus === "return accepted" || "return declined"){ %>
+                                                        <div class="col-md-3 text-center d-flex justify-content-center align-items-center productStatus">
+                                                            <p class="text-muted mb-0 small"><%= product.orderStatus %></p>
+                                                        </div>
+                                                    <% }  %>
+                                                        
+                                                        
+                                                </div>
+                                                <!-- <hr class="mb-4" style="background-color: #e0e0e0; opacity: 1;"> -->
+                                                
+                                                <% }) %>
+
+                                                <div class="wrapper d-flex flex-row-reverse justify-content-between align-items-center">
+                                                    <div class="col-md-3">
+                                                        <span class="text-muted">Payment mode : </span> <span class="text-muted"><%= data.paymentType %></span>
+                                                    </div>    
+                                                    <div class="col-md-2">
+                                                        <% if(data.status === "shipped" || data.status === "ordered" || data.status === "confirmed" || data.status === "pending" ){ %>
+                                                                <button class="btn btn-danger" onclick="cancelOrder('<%= data._id %>')">Cancel</button>
+                                                        <% } %>
+                                                    </div>
+                                                    <% if(typeof data.discount != "undefined"){ %>
+                                                        <div class="col-md-3">
+                                                            <span class="text-success">Discount : </span><span class="mb-0 text-success"><%= inFormat.format(data.discount) %></span>
+                                                        </div>
+                                                    <% } %>
+                                                </div>
+                                                
+                                            </div>
+                                        </div>
+
+                                <% }) %>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        
+
+        <script>
+
+            const button = document.getElementById('returnButton')
+            const span = document.getElementById('returnSpan')
+            button.addEventListener('click', (event) => {
+                event.preventDefault()
+                const orderId = document.getElementById('paraId').innerHTML
+                const proId = document.getElementById('proId').innerHTML
+                console.log('this is orderId', orderId);
+                console.log('this is proId', proId);
+                console.log('event triggered');
+                if (span.innerHTML === "Return") {
+                    console.log('calling ajaxxxxx');
+                    $.ajax(
+                        {
+                            url: `/returnRequest`,
+                            method: 'POST',
+                            data: {
+                                orderId: orderId,
+                                productId: proId
+                            },
+                            success: (response => {
+                                console.log(response);
+                                $('#reloadDiv').load('/viewOrders #reloadDiv')
+                            })
+
+
+                        }
+                    )
+                }
+
+
+            })
+
+            //cancel order
+
+            const cancelOrder = (orderId) => {
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You wan't to cancel the order?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, cancel it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+
+                        $.ajax(
+                            {
+                                url: '/cancelOrder',
+                                method: 'POST',
+                                data: {
+                                    orderId: orderId
+                                },
+                                success: (response) => {
+                                    console.log(response);
+                                    if (response) {
+                                        Swal.fire(
+                                            'Cancelled!',
+                                            'Your order has been cancelled',
+                                            'success'
+                                        )
+                                        setTimeout(() => {
+                                            Swal.close()
+                                            $('#reloadDiv').load('/viewOrders #reloadDiv')
+                                        }, 1500)
+                                    }
+                                }
+                            }
+                        )
+
+                    }
+                })
+
+
+            }
+
+
+        </script>
+
+
+
+        <%- include('../layout/user/user_footer.ejs') %>

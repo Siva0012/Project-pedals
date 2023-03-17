@@ -1,0 +1,224 @@
+<%- include('../layout/admin/admin_header.ejs') %>
+<%- include('../admin/navbar.ejs') %>
+<%- include('../admin/sidebar.ejs') %>
+
+<main id="main" class="main">
+
+    <div class="pagetitle">
+        <h1>Sales report</h1>
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                <li class="breadcrumb-item active">Sales report</li>
+            </ol>
+        </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section">
+        <div class="row">
+            <div class="col-lg-12">
+
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Enter the dates</h5>
+                        <form id="reportForm" method="post" action="/admin/getSalesReport">
+
+                            <div class="row mb-3">
+                                <label for="inputDate" class="col-sm-2 col-form-label">From</label>
+                                <div class="col-sm-10">
+                                    <input type="date" class="form-control" name="fromDate">
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <label for="inputDate" class="col-sm-2 col-form-label">To</label>
+                                <div class="col-sm-10">
+                                    <input type="date" class="form-control" name="toDate">
+                                </div>
+                            </div>
+
+
+                            <div class="row mb-3">
+                                <div class="col-sm-5 ms-auto">
+                                    <button type="submit" class="btn btn-success">Get Report</button>
+                                </div>
+                            </div>
+                            <!-- <div class="row mb-3">
+                                <div class="col-sm-5 ms-auto">
+                                    <button type="button" onclick="window.print()" class="btn btn-success">Print</button>
+                                </div>
+                            </div> -->
+
+                        </form>
+
+                        <div id="alertDiv" class="alert alert-warning" style="display: none;"></div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="tableDiv">
+                <% if(typeof salesReport !== 'undefined'){ %>
+    
+                    <div class="col-lg-12" id="tableDiv">
+        
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Sales report</h5>
+                                <table class="table" id="dataTable">
+                                    <thead>
+                                      <tr>
+                                        <th scope="col">No</th>
+                                        <th scope="col">User name</th>
+                                        <th scope="col">Order id</th>
+                                        <th scope="col">Order Date</th>
+                                        <th scope="col">Bill amount</th>
+                                        <th scope="col">Payment type</th>
+                                        <th scope="col">Status</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% salesReport.forEach((data , i) =>{ %>
+                                            <tr>
+                                              <th scope="row"><%=i + 1 %></th>
+                                              <td><%= data.userId.userName %></td>
+                                              <td><%= data.orderId %></td>
+                                              <td><%= moment(data.date).format("MMM Do YYYY")  %></td>
+                                              <td><%= data.total %></td>
+                                              <td><%= data.paymentType %></td>
+                                              <td><%= data.status %></td>
+                                            </tr>
+                                        <% }) %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+        
+                    </div>
+                <% } else{ %>
+
+                    <div class="tableDiv" style="display: none;">
+            
+                            <div class="col-lg-12" >
+                
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Example Card</h5>
+                                        <table class="table" id="dataTable">
+                                            <thead>
+                                              <tr>
+                                                <th scope="col">No</th>
+                                                <th scope="col">User name</th>
+                                                <th scope="col">Order id</th>
+                                                <th scope="col">Order Date</th>
+                                                <th scope="col">Bill amount</th>
+                                                <th scope="col">Payment type</th>
+                                                <th scope="col">Status</th>
+                                              </tr>
+                                            </thead>
+                                            <tbody id="tableBody">
+                                                
+                                                    <tr>
+                                                      <th scope="row"></th>
+                                                      <td></td>
+                                                      <td></td>
+                                                      <td></td>
+                                                      <td></td>
+                                                      <td></td>
+                                                      <td></td>
+                                                    </tr>
+                                               
+                                            </tbody>
+                                          </table>
+                                    </div>
+                                </div>
+                
+                            </div>
+                    </div>
+                <% } %>
+            </div>
+
+
+
+        </div>
+    </section>
+
+</main>
+
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js" integrity="sha512-CryKbMe7sjSCDPl18jtJI5DR5jtkUWxPXWaLCst6QjH8wxDexfRJic2WRmRXmstr2Y8SxDDWuBO6CQC6IE4KTA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> -->
+
+<script>
+
+    // document.addEventListener('DOMContentLoaded' , () =>{
+
+    //     const form = document.getElementById('reportForm')
+    //     const inputs = form.querySelectorAll('input')
+    
+    //     form.addEventListener('submit', (event) => {
+    //         event.preventDefault()
+    //         let nullFields = false
+    //         for (let i = 0; i < inputs.length; i++) {
+    //             if (inputs[i].value == "") {
+    //                 nullFields = true
+    //                 $('#alertDiv').show().html("All fields are required!!")
+    //                 setTimeout(() => {
+    //                     $('#alertDiv').fadeOut('slow')
+    //                 }, 1500)
+    //                 break
+    //             }
+    //         }
+    //         console.log('checked nullfields ');
+    //         /*------Empty fields checking------*/
+    //         if (!nullFields) {
+    //             console.log('entering  to false case');
+    //             const url = '/admin/getSalesReport'
+    //             const formData = new FormData(form)
+    //             fetch(url,
+    //                 {
+    //                     method: 'post',
+    //                     headers: { 'Content-Type': 'application/json' },
+    //                     body: JSON.stringify(Object.fromEntries(formData))
+    //                 }
+    //             )
+    //                 .then(response => response.json())
+    //                 .then(data => {
+    //                     console.log('this is dataaaaaaaaa' , data);
+    //                     console.log('this is salerReport' , data.salesReport);
+    //                     console.log('this is moment ' , data.moment);
+    //                     $('.tableDiv').attr({style : 'display : block'})
+    //                     const tbody = document.getElementById('tableBody')
+    //                     tbody.innerHTML = ''
+    //                     data.salesReport.forEach((sale, i) => {
+    
+    //                         const row = `
+    //             <tr>
+    //                 <th scope="row">${i + 1}</th>
+    //                 <td>${sale.userId.userName}</td>
+    //                 <td>${sale.orderId}</td>
+    //                 <td>${new Date(sale.date).toLocaleDateString('en-IN')}</td>
+    //                 <td>${sale.total}</td>
+    //                 <td>${sale.paymentType}</td>
+    //                 <td>${sale.status}</td>
+    //             </tr>
+    //         `
+    //         tbody.insertAdjacentHTML('beforeend', row);
+    
+    //                     })
+    //                 })
+    //         }
+    //     })
+    // })
+
+    $(document).ready(function() {
+    $('#dataTable').DataTable( {
+        dom: 'Bfrtip',
+        buttons: [
+            'print'
+        ]
+    } );
+} );
+
+</script>
+
+
+<%- include('../layout/admin/admin_footer.ejs') %>

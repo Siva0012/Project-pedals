@@ -70,5 +70,22 @@ admin_router.get('/viewCoupons' , adminController.viewCoupons)
 
 admin_router.post('/addCoupon' , adminController.addCoupon)
 
+admin_router.post('/deleteCoupon' , adminController.deleteCoupon)
+
 admin_router.get('/viewSingleOrder/:orderId' , adminController.viewSingleOrder)
+
+admin_router.post('/changeOrderStatus/:status/:orderId' , adminController.changeOrderStatus)
+
+admin_router.get('/updateChart' ,adminController.updateChart)
+
+admin_router.get('/updateDonut' , adminController.updateDonut)
+
+admin_router.get('/viewSalesReport' , adminController.viewSalesReport)
+
+admin_router.post('/getSalesReport' , adminController.getSalesReport)
+
+admin_router.get('/viewReturnRequests/:orderId' , adminController.viewReturnRequests)
+
+admin_router.post('/changeReturnStatus/:status' , adminController.changeReturnStatus)
+
 module.exports = admin_router

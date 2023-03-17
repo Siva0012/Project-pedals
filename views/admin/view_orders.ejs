@@ -2,34 +2,40 @@
 <%- include('../admin/navbar.ejs')  %> 
 <%- include('../admin/sidebar.ejs')  %> 
 
+<% const inFormat = new Intl.NumberFormat('en-IN' , {style : 'currency' , currency : 'INR'}) %>
+
 <main id="main" class="main">
 
   <div class="pagetitle">
-    <h1>General Tables</h1>
+    <h1>Orders</h1>
     <nav>
       <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-        <li class="breadcrumb-item">Tables</li>
-        <li class="breadcrumb-item active">General</li>
+        <li class="breadcrumb-item active">Orders</li>
       </ol>
     </nav>
   </div><!-- End Page Title -->
 
-  <section class="section">
+  <section class="section" id="reloadSection">
     <div class="row">
 
       <div class="col-lg-12">
 
         <div class="card">
           <div class="card-body">
-            <h5 class="card-title">Order details</h5>
+            <div class="titleDiv d-flex justify-content-between align-items-center">
+              <h5 class="card-title">Order details</h5>
+              
+
+            </div>
 
             <!-- Table with stripped rows -->
-            <table class="table table-bordered border-primary">
+            <table class="table table-bordered border-primary" id="orderTable">
               <thead>
                  <tr>
                    <th scope="col">No</th>
                    <th scope="col">Order id</th> 
+                   <th scope="col">Date of oreder</th> 
                    <th scope="col">User name</th>
                    <th scope="col">Products</th>
                    <th scope="col">Bill amount</th>
@@ -39,13 +45,16 @@
                  </tr>
                 
               </thead>
-              <tbody>
+              <tbody id="tableBody">
                 <% for(let i = 0; i<orderDetails.length; i++){ %>
                   <% const product = orderDetails[i].product %>
                     <tr>
                       <th scope="row"><%= i+1 %></th>
 
                       <td><%= orderDetails[i].orderId %></td>
+
+                      <% const date = orderDetails[i].date %>
+                      <td><%= moment(date).format("MMM Do YY") %></td>
 
                       <td><%= orderDetails[i].userId.userName %></td>
 
@@ -58,18 +67,165 @@
                       <% } %>
                       </td>
 
-                      <td><%= orderDetails[i].total %></td>
+                      <% const billAmount = orderDetails[i].total %>
+                      <td><%= inFormat.format(billAmount) %></td>
 
                       <td><%= orderDetails[i].paymentType %></td>
 
-                      <td><%= orderDetails[i].status %></td>
+                      <!---order status--->
+                      <% if (orderDetails[i].paymentType === "cod"){ %>
+                        <!---COD payment--->
+                        <% if(orderDetails[i].status === "confirmed"){ %>
+                          <td>
+                            <div class="dropdown">
+                              <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <%= orderDetails[i].status %>
+                              </button>
+                              <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" id="<%= orderDetails[i]._id %>" href="/changeOrderStatus/shipped/<%= orderDetails[i]._id %>"> <button class="btn btn-primary statusChangeButton" type="button">Shipped</button></a></li>
+                                <li><a class="dropdown-item" id="<%= orderDetails[i]._id %>" href="/changeOrderStatus/delivered/<%= orderDetails[i]._id %>"> <button class="btn btn-primary statusChangeButton" type="button">Delivered</button></a></li>
+                              </ul>
+                            </div>
+                          </td>
+                          <% } else if(orderDetails[i].status === "shipped"){ %>
+                            <td>
+                              <div class="dropdown">
+                                <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                  <%= orderDetails[i].status %>
+                                </button>
+                                <ul class="dropdown-menu">
+                                  <li><a class="dropdown-item" id="<%= orderDetails[i]._id %>"  href="/changeOrderStatus/delivered/<%= orderDetails[i]._id %>"><button class="btn btn-primary statusChangeButton" type="button">Delivered</button></a></li>
+                                </ul>
+                              </div>
+                            </td>
+                        <% } else if(orderDetails[i].status === "delivered") { %>
+                          <td>Product delivered</td>
+                        <% } else if(orderDetails[i].status === "requested for return"){ %>
+                          <td>
+                            <div class="dropdown">
+                              <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <%= orderDetails[i].status %>
+                              </button>
+                              <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" id="<%= orderDetails[i]._id %>"  href="/admin/viewReturnRequests/<%= orderDetails[i]._id %>"><button class="btn btn-primary" type="button">view return requests</button></a></li>
+                              </ul>
+                            </div>
+                          </td>
+                        <% } else if(orderDetails[i].status === "return accepted" || orderDetails[i].status === "return declined") { %>
+                          <td><%= orderDetails[i].status %></td>
+                        <% } else { %>
+                          <td><%= orderDetails[i].status %></td>
+                        <% } %>
+
+                      <% }else if(orderDetails[i].paymentType === "online"){ %>
+                        <!---Online payment--->
+                        <% if(orderDetails[i].status === "pending"){ %>
+                          <td>
+                            <div class="dropdown">
+                              <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <%= orderDetails[i].status %>
+                              </button>
+                              <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" id="<%= orderDetails[i]._id %>" href="/changeOrderStatus/shipped/<%= orderDetails[i]._id %>"><button class="btn btn-primary statusChangeButton" type="button">Shipped</button></a></li>
+                                <li><a class="dropdown-item" id="<%= orderDetails[i]._id %>" href="/changeOrderStatus/delivered/<%= orderDetails[i]._id %>"><button class="btn btn-primary statusChangeButton" type="button">Delivered</button></a></li>
+                              </ul>
+                            </div>
+                          </td>
+                        <% }else if(orderDetails[i].status === "ordered"){ %>
+                          <td>
+                            <div class="dropdown">
+                              <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <%= orderDetails[i].status %>
+                              </button>
+                              <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" id="<%= orderDetails[i]._id %>"  href="/changeOrderStatus/shipped/<%= orderDetails[i]._id %>"><button class="btn btn-primary statusChangeButton" type="button">Shipped</button></a></li>
+                                <li><a class="dropdown-item" id="<%= orderDetails[i]._id %>"  href="/changeOrderStatus/delivered/<%= orderDetails[i]._id %>"><button class="btn btn-primary statusChangeButton" type="button">Delivered</button></a></li>
+                              </ul>
+                            </div>
+                          </td>
+                          <% } else if(orderDetails[i].status === "shipped"){ %>
+                            <td>
+                              <div class="dropdown">
+                                <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                  <%= orderDetails[i].status %>
+                                </button>
+                                <ul class="dropdown-menu">
+                                  <li><a class="dropdown-item" id="<%= orderDetails[i]._id %>"  href="/changeOrderStatus/delivered/<%= orderDetails[i]._id %>"><button class="btn btn-primary statusChangeButton" type="button">Delivered</button></a></li>
+                                </ul>
+                              </div>
+                            </td>
+                          <% } else if(orderDetails[i].status === "delivered") { %>
+                            <td>
+                              Product delivered
+                            </td>
+                          <% } else if(orderDetails[i].status === "requested for return"){ %>
+                            <td>
+                              <div class="dropdown">
+                                <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                  <%= orderDetails[i].status %>
+                                </button>
+                                <ul class="dropdown-menu">
+                                  <li><a class="dropdown-item" id="<%= orderDetails[i]._id %>"  href="/admin/viewReturnRequests/<%= orderDetails[i]._id %>"><button class="btn btn-primary" type="button">view return requests</button></a></li>
+                                </ul>
+                              </div>
+                            </td>
+                          <% } else if(orderDetails[i].status === "return accepted" || orderDetails[i].status === "return declined") { %>
+                            <td><%= orderDetails[i].status %></td>
+                          <% } else { %>
+                            <td><%= orderDetails[i].status %></td>
+                          <% } %>
+                      <% } else{ %>
+                        <!---wallet payment--->
+                        <% if(orderDetails[i].status === "confirmed"){ %>
+                          <td>
+                            <div class="dropdown">
+                              <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <%= orderDetails[i].status %>
+                              </button>
+                              <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" id="<%= orderDetails[i]._id %>" href="/changeOrderStatus/shipped/<%= orderDetails[i]._id %>"> <button class="btn btn-primary statusChangeButton" type="button">Shipped</button></a></li>
+                                <li><a class="dropdown-item" id="<%= orderDetails[i]._id %>" href="/changeOrderStatus/delivered/<%= orderDetails[i]._id %>"> <button class="btn btn-primary statusChangeButton" type="button">Delivered</button></a></li>
+                              </ul>
+                            </div>
+                          </td>
+                          <% } else if(orderDetails[i].status === "shipped"){ %>
+                            <td>
+                              <div class="dropdown">
+                                <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                  <%= orderDetails[i].status %>
+                                </button>
+                                <ul class="dropdown-menu">
+                                  <li><a class="dropdown-item" id="<%= orderDetails[i]._id %>"  href="/changeOrderStatus/delivered/<%= orderDetails[i]._id %>"><button class="btn btn-primary statusChangeButton" type="button">Delivered</button></a></li>
+                                </ul>
+                              </div>
+                            </td>
+                        <% } else if(orderDetails[i].status === "delivered") { %>
+                          <td>Product delivered</td>
+                        <% } else if(orderDetails[i].status === "requested for return"){ %>
+                          <td>
+                            <div class="dropdown">
+                              <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <%= orderDetails[i].status %>
+                              </button>
+                              <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" id="<%= orderDetails[i]._id %>"  href="/admin/viewReturnRequests/<%= orderDetails[i]._id %>"><button class="btn btn-primary" type="button">view return requests</button></a></li>
+                              </ul>
+                            </div>
+                          </td>
+                        <% } else if(orderDetails[i].status === "return accepted" || orderDetails[i].status === "return declined") { %>
+                          <td><%= orderDetails[i].status %></td>
+                        <% } else { %>
+                          <td><%= orderDetails[i].status %></td>
+                        <% } %>
+                                                
+                      <% } %>
 
                       <td>
                         <div class="button-wrapper d-flex flex-column align-items-between">
                           <a href="/admin/viewSingleOrder/<%= orderDetails[i]._id %>">
                             <button class="btn btn-primary mb-3" type="button">view</button>
                           </a>
-                          <button class="btn btn-warning">Cancel</button>
+                          <!-- <button class="btn btn-warning">Cancel</button> -->
                         </div>
                       </td>
                     </tr>
@@ -88,7 +244,42 @@
 </main><!-- End #main -->
 
 
+<script>
 
+  const button = document.querySelectorAll('.statusChangeButton')
+  const parant = document.querySelector('.card')
+  parant.addEventListener('click' , () =>{
 
+    // button.forEach((button) =>{
+      // button.addEventListener('click' , (event) =>{
+        if(event.target.matches('.statusChangeButton')){
+          event.preventDefault()
+          let url = new URL(event.target.parentElement.href).pathname
+          console.log('url isssssssssssss', url);
+          $.ajax({
+            url : `/admin/${url}`,
+            method : "post",
+            body : {server : 'called'},
+            success : (response) =>{
+              console.log('response in client' , response);
+              if(response){
+                console.log('this is repsonse');
+                $('#orderTable').load('/admin/viewOrders #orderTable')
+              }
+            }        
+          })
+        }
+      // })
+    // })
+  })
+  
+
+  const returnButton = document.getElementById('viewReturnButton')
+  returnButton.addEventListener('click' , (event) =>{
+    event.preventDefault()
+
+  })
+  
+</script>
 
 <%- include('../layout/admin/admin_footer.ejs')  %> 

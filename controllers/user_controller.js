@@ -8,7 +8,15 @@ const session = require('express-session')
 const bcrypt = require('bcrypt')
 const { v4: uuidv4 } = require('uuid');
 const moment = require('moment')
-// const newId = uuidv4()
+const crypto = require('crypto')
+
+// Razor pay
+const Razorpay = require('razorpay')
+const instance = new Razorpay({
+    key_id: 'rzp_test_eIwPjzr9pgCA29',
+    key_secret: 'Aic4NzfdPjZk1oVOmKINZuUx',
+  });
+
 
 require('dotenv').config()
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
@@ -17,6 +25,9 @@ const serviceSid = process.env.TWILIO_SERVICE_SID
 const client = require('twilio')(accountSid, authToken);
 const Noty = require('noty')
 const { response } = require('../routes/user_routes')
+const { default: mongoose } = require('mongoose')
+const { reverse } = require('dns')
+const { ObjectId } = require('mongodb')
 
 
 /*--------loads user login page--------*/
@@ -240,14 +251,23 @@ const viewProducts = async (req , res , next) =>{
     try{
 
         if(req.session.user_id){
+            const userId = req.session.user_id
+            const pageNum = req.params.page
+            const perPage = 3
+            let docCount
+            console.log('type of user id is' , typeof userId , userId);
             const userData = await Users.findOne({ _id : req.session.user_id})
             if(!userData.block){
                 const catId = req.params.id
                 const userName = userData.userName
-                const showProducts =await Products.find({ category : catId , listed : true})
+                const showProducts =await Products.countDocuments({ category : catId , listed : true , stock : {$gt : 0}})
+                
                 const catData = await Category.find({})
+                //category name
+                const catDetails = await Category.findOne({ _id : catId })
+                const catName = catDetails.name
                 const cartData = await Users.findOne({ _id : req.session.user_id}).populate('cart.productId')
-                res.render('viewall_products' , {userName : userName , showProducts : showProducts , catData : catData , cartData : cartData})
+                res.render('viewall_products' , {userName : userName , showProducts : showProducts ,  catData : catData , cartData : cartData , userData : userData , catName : catName , catId : catId})
             }else{
                 req.session.user_id = null
                 req.session.user = null
@@ -256,9 +276,11 @@ const viewProducts = async (req , res , next) =>{
              
         }else{
             const catId = req.params.id
-            const showProducts =await Products.find({ category : catId , listed : true})
+            const showProducts =await Products.find({ category : catId , listed : true , stock : {$gt : 0}})
             const catData = await Category.find({})
-            res.render('viewall_products' , {showProducts : showProducts , catData : catData}) 
+            const catDetails = await Category.findOne({ _id : catId })
+            const catName = catDetails.name
+            res.render('viewall_products' , {showProducts : showProducts , catData : catData , catName : catName , catId : catId}) 
         }
         
     }catch(error){
@@ -333,6 +355,41 @@ const addToCart = async (req , res , next) =>{
     }
 }
 
+/*----------Add to cart from wishlist---------*/
+const addFromWish = async (req , res , next) =>{
+
+    try{
+        if(req.session.user_id){
+            const productId = req.params.id
+            const userId = req.session.user_id
+            const proData = await Products.findOne({ _id : productId})
+
+            //checking for existing product
+            await Users.findOne(
+                { _id : userId , 'cart.productId' : productId}
+            )
+            .then( async (response) =>{
+                console.log('this is response in checking existing product in cartt' , response);
+                if(!response){
+                    //add to cart
+                    await Users.updateOne(
+                        { _id : userId },
+                        { $push : {cart : {productId : productId , totalProductAmount : proData.price}}}
+                    )
+                    res.json({success : true})
+                }else{
+                    res.json({success : false})
+                }
+            })
+            
+        }
+
+    }catch(error){
+        next(error)
+        console.log(error.message);
+    }
+}
+
 /*-----------change quantity-------------*/
 const changeQuantity = async (req , res , next) =>{
 
@@ -357,11 +414,15 @@ const viewWishList = async (req , res , next) =>{
 
     try {
         if(req.session.user_id){
-            const userData = await Users.findOne({_id : req.session.user_id})
+            const userId = req.session.user_id
+            const userData = await Users.findOne({_id : userId})
             const userName = userData.userName
             const catData = await Category.find({})
             console.log('wishlist page is loading');
-            res.render('wishlist_page' , {userName : userName , catData : catData} )
+            const wishData = await Users.findOne({ _id : userId }).populate('wishlist.productId')
+            console.log('this is wishdata' , wishData);
+
+            res.render('wishlist_page' , {userName : userName , catData : catData , wishData : wishData} )
         }else{
             res.redirect('/userLogin')
         }
@@ -506,8 +567,7 @@ const insertAddress = async (req , res ,next) =>{
             )
 
             console.log(response);
-            
-            res.redirect('/viewAddresses')
+            res.json({success : true})
 
         }
     }catch(error){
@@ -528,7 +588,8 @@ const deleteAddress = async (req , res , next) =>{
                 {$pull : {addresses : {_id : addressId}}},
                 {new : true}
             )
-            res.redirect('/viewAddresses')
+            // res.redirect('/viewAddresses')
+            res.json({success : true})
         }
         
     }catch(error){
@@ -593,6 +654,9 @@ const placeOrder = async (req , res , next) =>{
             const deliveryAddress = req.body.address
             const paymentMethod = req.body.paymentMethod
             const orderData = req.body
+
+            console.log('this is request body in placeorder' , req.body);
+            
             
             const orderDetails = []
             orderData.products = orderDetails
@@ -636,31 +700,141 @@ const placeOrder = async (req , res , next) =>{
                     if(error){
                         console.log('order submission failed');
                     }else{
+
+                        /*-------Changing cart amount--------*/
+                        const userUpdate = await Users.updateOne({ _id : userId} , {$set : {totalCartAmount : '0'}})
+                        console.log('this is updated user' , userUpdate);
+
+                        /*-----Empty cart-----*/
                         const orderData = await Orders.findOne({ _id : response._id}).populate('product.productId')
                         const emptyCart = []
                         await Users.updateOne({_id : userId} , {$set : {cart : emptyCart}})
-                        res.render('cod_order_confirm' , {userData : userData , userName : userName , catData : catData , orderData : orderData , moment : moment })
+                        .then((response) =>{
+                            res.json({success : true , orderData : orderData})
+                        })
+
+
                     }
                 })
             }else{
-                const orderSummary = new Orders( {
-                    userId : userId,
-                    orderId : `orderId_${uuidv4()}`,
-                    deliveryAddress : deliveryAddress,
-                    product : orderDetails,
-                    total : orderData.totalCartAmount[0],
-                    paymentType : paymentMethod,
-                })
-                await orderSummary.save()
-                .then((response , error) =>{
-                    if(error){
-                        console.log('failed order submission');
+                const totalCartAmount = Number(req.body.totalCartAmount[0])
+                console.log('this is totalcartamount in online section' ,typeof totalCartAmount , totalCartAmount);
+                // const orderId = `orderId-${uuidv4()}`
+                const orderId = `orderId-${uuidv4()}`.substring(0, 40);
+                req.session.orderId = orderId // saving orderId to session
+                console.log('this is orderid' , orderId);
+
+                /*------Razor pay instance-----*/
+                const options = {
+                    amount: totalCartAmount * 100,  // amount in the smallest currency unit
+                    currency: "INR",
+                    receipt: orderId
+                  };
+                  instance.orders.create(options, async function(err, order) {
+                    if(err){
+                        console.log(err);
                     }else{
-                        console.log("This is response from order confirmation" , response);
+                        console.log('created order hereeeeee and passing to the client' , order);
+                        const orderSummary = new Orders( { /*----Saving order to the database----*/
+                            userId : userId,
+                            orderId : orderId,
+                            deliveryAddress : deliveryAddress,
+                            product : orderDetails,
+                            total : orderData.totalCartAmount[0],
+                            paymentType : paymentMethod,
+                            status : 'pending'
+                        })
+                        let newOrderId 
+                        await orderSummary.save()
+                        .then((response , error) =>{
+                            if(error){
+                                console.log('failed order submission');
+                            }else{
+                                console.log("This is response from order confirmation" , response);
+                                console.log('this is order id from saved orderrrrrrrrrrrrrrrr' , response._id);
+                                newOrderId = response._id        
+                            }
+                        })
+
+                        res.json({success : false , order : order , orderId : newOrderId})
+                    }
+                  });
+            }
+            
+        }
+    }catch(error){
+        next(error)
+        console.log(error.message);
+    }
+}
+
+/*-------verify payment--------*/
+const verifyPayment = async (req , res , next) =>{
+
+    try{
+        if(req.session.user_id){
+            const userId = req.session.user_id
+            const {payment , order , orderId} = req.body
+            const sessionOrderId = req.session.orderId
+            let hash = crypto.createHmac('sha256', 'Aic4NzfdPjZk1oVOmKINZuUx') /* creating hash code using sha256 algorithm */
+            hash.update(order.id + "|" + payment.razorpay_payment_id , 'Aic4NzfdPjZk1oVOmKINZuUx' )
+            hash = hash.digest('hex')
+
+            if(hash == payment.razorpay_signature){
+                await Orders.findOne({ orderId : sessionOrderId })
+                .then((response) =>{
+                })
+
+                /*------Empty cart------*/
+                const emptyCart = []
+                await Users.updateOne({_id : userId} , {$set : {cart : emptyCart}})
+                .then((response) =>{
+                })
+                /*------Changing total cart amount------*/
+                const userUpdate = await Users.updateOne({ _id : userId} , {$set : {totalCartAmount : '0'}})
+
+                /*------changing order status to ordered-----*/
+                await Orders.updateOne({ orderId : sessionOrderId } , {$set : {status : "ordered"}})
+                .then((response , err) =>{
+                    if(err){
+                        console.log('failed to update in success payment');
+                    }else{
+                        res.json({success : true})
+                    }
+                })
+                
+            }else{
+                /*-------changing order status to payment failed-----*/
+                await Orders.updateOne({ orderId : session } , {$set : {status : "Payment failed"}})
+                .then((response , err) =>{
+                    if(err){
+                        console.log('failed to update in failed payment');
+                    }else{
+                        res.json({success : false})
                     }
                 })
             }
-            
+        }
+    }catch(error){
+        next(error)
+        console.log(error.message);
+    }
+}
+
+/*==========================================================================verify payment by comparing two idssss left===================*/
+
+/*--------cod order confirm page------*/
+const viewCodConfirm = async (req , res , next) =>{
+
+    try{
+        if(req.session.user_id){
+            const userId = req.session.user_id
+            const orderId = req.params.orderId
+            const catData = await Category.find({})
+            const userData = await Users.findOne({ _id : userId})
+            const orderData = await Orders.findOne({ _id : orderId}).populate('product.productId')
+            const userName = userData.userName
+            res.render('cod_order_confirm' , {userData : userData , userName : userName , catData : catData , orderData : orderData , moment : moment })
         }
     }catch(error){
         next(error)
@@ -671,75 +845,185 @@ const placeOrder = async (req , res , next) =>{
 const redeemCoupon = async (req , res , next) =>{
 
     try{
-        
-        
-        const userId = req.session.user_id
-        const couponCode = req.body.couponCode
-        const userData = await Users.findOne({ _id : userId})
-        const coupon = await Coupons.findOne({couponCode : couponCode});
 
-        /*------coupon checking parameters-----*/
-        const totalCartAmount = userData.totalCartAmount
-        console.log('this is userData in redeem coupon' , userData);
-        console.log('this is totalcartAmount in redeem coupon' , totalCartAmount);
-        const currentDate = new Date()
-        if(!coupon){
-            console.log('no coupon exists');
-            return res.json({error : 'No coupon exists!!!'})
-            // return res.json({message : 'No coupon exists!!!'})
-        }else{
-            const expiryDate = coupon.expiryDate
-            const minPurchaseAmount = coupon.minPurchaseAmount
-            const maxDiscountPercentage = coupon.percentageDiscount / 100
-            const maxDiscountAmount = coupon.maxDiscount
-            const isClaimed = await Coupons.findOne({ couponCode : couponCode, claimedUsers: {$elemMatch: {userId: userId}}});
-            if(isClaimed){
-                console.log('already claimed');
-                return res.json({claimed : 'Already claimed'})
-                // return res.json({message : 'Already claimed'})
+        if(req.session.user_id){
+
+            const userId = req.session.user_id
+            const couponCode = req.body.couponCode
+            const userData = await Users.findOne({ _id : userId})
+            const coupon = await Coupons.findOne({couponCode : couponCode});
+    
+            /*------coupon checking parameters-----*/
+            const totalCartAmount = userData.totalCartAmount
+            const currentDate = new Date()
+            if(!coupon){
+                return res.json({error : 'No coupon exists!!!'})
             }else{
-                console.log('Not claimed');
-                if(currentDate.getDate() <= expiryDate.getDate()){
-                    console.log('data is ok');
-                    if(totalCartAmount >= minPurchaseAmount){
-
-                        const availableDiscountAmount = totalCartAmount * maxDiscountPercentage
-                        console.log('this is availabledicountAmount ' ,typeof availableDiscountAmount , availableDiscountAmount);
-                        let discountGained
-                        if(availableDiscountAmount >= maxDiscountAmount){
-                            discountGained = maxDiscountAmount
-                            console.log('this is greater than disounct amount' , discountGained);
-                        }else{
-                            discountGained = availableDiscountAmount
-                            console.log('this is lesser discount amount' , discountGained);
-                        }
-                        const oldCartAmount = totalCartAmount
-                        console.log('this is oldcartamount ' , oldCartAmount);
-                        const newTotalCartAmount = totalCartAmount - discountGained
-                        console.log('this is cartamount after discount' , newTotalCartAmount);
-                        const updateResponse = await Users.updateOne({ _id : userId} , {$set : {totalCartAmount : newTotalCartAmount}})
-                        console.log('this is updated totalcart amount in user' , updateResponse);
-                        await Users.findOne({ _id: userId})
-                        .then((response) =>{
-                            console.log('this is response.totalcart amount after updation' , response);
-                        })
-                        const couponClaimed = await Coupons.updateOne({couponCode : couponCode} , {$push : {claimedUsers : {userId : userId}}})
-                        if(couponClaimed){
-                            console.log('coupon applied');
-                            return res.json({message : 'Coupon applied!' , oldCartAmount : oldCartAmount , newTotalCartAmount : newTotalCartAmount})
-                        }
-
-                    }else{
-                        console.log('minimum purchase amount is insufficient');
-                        return res.json({minimumAmount : `Minimum purchase amount is Rs.${minPurchaseAmount}`})
-                    }
+                const expiryDate = coupon.expiryDate
+                const minPurchaseAmount = coupon.minPurchaseAmount
+                const maxDiscountPercentage = coupon.percentageDiscount / 100
+                const maxDiscountAmount = coupon.maxDiscount
+                const isClaimed = await Coupons.findOne({ couponCode : couponCode, claimedUsers: {$elemMatch: {userId: userId}}});
+                if(isClaimed){
+                    return res.json({claimed : 'Already claimed'})
                 }else{
-                    console.log('the coupon has expired');
-                    return res.json({couponExpired: 'The coupon has expired!'})
+                    if(currentDate.getDate() <= expiryDate.getDate()){
+                        if(totalCartAmount >= minPurchaseAmount){
+    
+                            const availableDiscountAmount = totalCartAmount * maxDiscountPercentage
+                            let discountGained
+                            if(availableDiscountAmount >= maxDiscountAmount){
+                                discountGained = maxDiscountAmount
+                            }else{
+                                discountGained = availableDiscountAmount
+                            }
+                            const oldCartAmount = totalCartAmount
+                            const newTotalCartAmount = totalCartAmount - discountGained
+    
+                            const discountAmount = oldCartAmount - newTotalCartAmount
+                            return res.json({message : 'Coupon applied!' , oldCartAmount : oldCartAmount , newTotalCartAmount : newTotalCartAmount , couponCode : couponCode , discountAmount : discountAmount})
+    
+                        }else{
+                            return res.json({minimumAmount : `Minimum purchase amount is Rs.${minPurchaseAmount}`})
+                        }
+                    }else{
+                        return res.json({couponExpired: 'The coupon has expired!'})
+                    }
+    
                 }
-
             }
+        }else{
+            redirect('/')
         }
+        
+    }catch(error){
+        next(error)
+        console.log(error.message);
+    }
+}
+
+/*-------Add to wishlist-------*/
+const addToWishlist = async (req , res , next) =>{
+
+    try{
+        if(req.session.user_id){
+            const userId = req.session.user_id
+            const proId = req.params.proId
+
+            await Users.updateOne({ _id : userId} , {$push : {wishlist : {productId : proId}}} , {new : true})
+            .then((response) =>{
+                res.json(response)
+            })
+        }
+
+    }catch(error){
+        next(error)
+        console.log(error.message);
+    }
+}
+
+/*--------Remove from wishlist-------*/
+const removeFromWishlist = async (req , res , next) =>{
+
+    try{
+        if(req.session.user_id){
+            const userId = req.session.user_id
+            const productId = req.params.proId
+
+            await Users.updateOne(
+                { _id : userId},
+                {$pull : {wishlist : {productId : productId}}}
+            )
+            .then(response =>{
+                res.json(response)
+            })
+
+        }
+    }catch(error){
+        next(error)
+        console.log(error.message);
+    }
+}
+
+/*-----Delete from wishlist-----*/
+const deleteFormWishlist = async (req , res , next) =>{
+
+    try{
+
+        if(req.session.user_id){
+            const userId = req.session.user_id
+            const proId = req.params.proId
+            await Users.updateOne({ _id: userId }, { $pull: { wishlist: { productId: proId } } }, { new: true })
+            await Products.updateOne({ _id : proId} , {$push : {wishlistedUsers : {userId : userId}}} , {new : true})
+        }
+    }catch(error){
+        next(error)
+        console.log(error.message);
+    }
+}
+
+/*--------view orders--------*/
+const viewOrders = async (req , res , next) =>{
+
+    try{
+        if(req.session.user_id){
+            const userId = (req.session.user_id) 
+            const catData = await Category.find({})
+            const userData = await Users.findOne({ _id : userId})
+            const orderDetails = await Orders.find({}).populate('userId').populate('product.productId')
+            let orderData = []
+            for(let i = 0 ; i < orderDetails.length ; i++){
+                if(orderDetails[i].userId._id.equals(userId)){
+                    orderData[i] = orderDetails[i]
+                }
+            }
+
+            orderData = orderData.reverse()
+            const userName = userData.userName
+            res.render('view_orders' , {catData : catData , userName : userName , orderData : orderData , moment : moment})
+        }else{
+            res.render('user_login')
+        }
+    }catch(error){
+        next(error)
+        console.log(error.message);
+    }
+}
+
+/*------Request for return-----*/
+const returnRequest = async (req , res , next) =>{
+
+    try{
+
+        const{orderId , productId} = req.body
+        await Orders.updateOne(
+            { _id : orderId , 'product.productId' : productId},
+            {$set : {status : 'requested for return' , 'product.$.orderStatus' : "requestedReturn"}}
+        )
+        .exec()
+        .then((response) =>{
+            if(response){
+                res.json({success : true})
+            }
+        })
+
+
+    }catch(error){
+        next(error)
+        console.log(error.message);
+    }
+}
+
+const searchProducts = async (req , res , next) =>{
+
+    try{
+        let payload = req.body.payload
+        let catId = req.body.catId
+        let searchKey = new RegExp(payload , "i")
+        let search = await Products.find({name : searchKey , category : catId})
+        search = search.slice(0 , 4)
+        res.send({payload : search})
+
     }catch(error){
         next(error)
         console.log(error.message);
@@ -760,6 +1044,7 @@ module.exports = {
     addToCart,
     changeQuantity,
     viewWishList,
+    addFromWish,
     viewUserProfile,
     deleteFromCart,
     viewAddresses,
@@ -767,7 +1052,12 @@ module.exports = {
     deleteAddress,
     editAddress,
     viewCheckoutPage,
-    placeOrder,
     changePassword,
-    redeemCoupon
+    redeemCoupon,
+
+    addToWishlist,
+    removeFromWishlist,
+    searchProducts,
+    viewOrders,
+    returnRequest
 }

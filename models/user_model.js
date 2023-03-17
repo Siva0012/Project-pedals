@@ -56,8 +56,10 @@ const userSchema = new mongoose.Schema({
     ],
     wishlist : [
          {
-            type : mongoose.Schema.Types.ObjectId,
-            ref : 'Product'
+            productId : {
+                type : mongoose.Schema.Types.ObjectId,
+                ref : 'Product'
+            }
         }
     ],
     totalCartAmount : {
@@ -95,7 +97,11 @@ const userSchema = new mongoose.Schema({
                 required : true
             }
         }        
-    ]
+    ],
+    walletAmount : {
+        type : Number,
+        default : 0
+    }
 
 })
 

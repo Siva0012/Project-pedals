@@ -1,62 +1,6 @@
 <%- include('../layout/user/user_header.ejs') %>
 <%- include('../user/user_nav.ejs') %>
 
-<!-- <div class="container">
-    <div class="row mb-3">
-        <div class="flex-box d-flex justify-content-center">
-            <div class="col-6" style="background-color: blanchedalmond;">
-
-                <div class="order-body-flex text-align-center">
-                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ullam labore repellat quasi nostrum beatae cumque aut, repudiandae, quo assumenda doloribus itaque consequatur quae optio hic qui quidem. Excepturi magni dignissimos at culpa officia ipsa quasi?</p>
-                    <div class="col ">
-                        <div class="title border border-primary-subtle text-center">
-                            <h5>Your order has been confirmed</h5>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="order-fields border border-primary-subtle d-flex justify-content-between py-3">
-                            <div class="col-4">
-                                Order Id
-                            </div>
-                            <div class="col-8">
-                                34252346266346
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="order-fields border border-primary-subtle d-flex justify-content-between py-3">
-                            <div class="col-4">
-                                Order Id
-                            </div>
-                            <div class="col-8">
-                                34252346266346
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="order-fields border border-primary-subtle d-flex justify-content-between py-3">
-                            <div class="col-4">
-                                Order Id
-                            </div>
-                            <div class="col-8">
-                                34252346266346
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="flex-box d-flex justify-content-center">
-            <div class="col-6" style="background-color: rgb(116, 93, 59);">
-                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ullam labore repellat quasi nostrum beatae cumque aut, repudiandae, quo assumenda doloribus itaque consequatur quae optio hic qui quidem. Excepturi magni dignissimos at culpa officia ipsa quasi?</p>
-
-            </div>
-        </div>
-    </div>
-</div> -->
 <% const inFormat = new Intl.NumberFormat('en-IN' , {style : 'currency' , currency : 'INR'}) %>
 <section class="h-100 gradient-custom">
     <div class="container py-5 h-100">
@@ -64,7 +8,16 @@
         <div class="col-lg-10 col-xl-8">
           <div class="card" style="border-radius: 10px;">
             <div class="card-header px-4 py-5">
-              <h5 class="text-muted mb-0">Thanks for your Order, <span style="color: #a8729a;"><%= userName %></span>!</h5>
+              <div class="flexcontainer d-flex justify-content-between">
+                <div class="div1">
+                  <h5 class="text-muted mb-0">Thanks for your Order, <span style="color: #a8729a;"><%= userName %></span>!</h5>
+                </div>
+                <div class="div2">
+                  <a href="/viewOrders">
+                    <button class="btn btn-success" type="button">View all orders</button>
+                  </a>
+                </div>
+              </div>
             </div>
             <div class="card-body p-4">
                 <div class="d-flex justify-content-between align-items-center mb-4">

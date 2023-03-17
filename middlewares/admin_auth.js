@@ -5,8 +5,7 @@ const isLogIn = async (req , res , next) =>{
         if(req.session.admin_id){
 
         }else{
-            console.log('login catch is catching an error');
-            console.log("admin doesn't have a session so redirecting");
+            
             return res.redirect('/admin')
         }
         next()

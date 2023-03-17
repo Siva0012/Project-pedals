@@ -1,11 +1,18 @@
 const mongoose = require('mongoose')
+require('dotenv').config()
 
 
-mongoose.connect('mongodb://127.0.0.1:27017/pedals' , 
-{
-    useNewUrlParser : true,
-    useUnifiedTopology : true
+let connectToDatabase = () =>{
+
+    const url = process.env.MONGODB_URL
+    mongoose.connect(url , 
+    {
+        useNewUrlParser : true,
+        useUnifiedTopology : true
+    }
+    ).then(() =>{
+        console.log('connected to server');
+    }).catch(err => console.log("Error connecting to server" + err))
 }
-).then(() =>{
-    console.log('connected to server');
-}).catch(err => console.log("Error connecting to server" + err))
+
+module.exports = {connectToDatabase}

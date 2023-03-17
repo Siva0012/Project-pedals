@@ -2,6 +2,8 @@
 
     <%- include('../user/user_nav.ejs') %>
 
+    <% const inFormat = new Intl.NumberFormat('en-IN' , {style : 'currency' , currency : 'INR'}) %>
+
         <div class="bodyReloader">
 
             <!-- breadcrumb -->
@@ -65,7 +67,8 @@
                                                 </div>
                                             </td>
                                             <td class="column-3">
-                                                <%= proData.productId.price %>
+                                                <% const proPrice = proData.productId.price %>
+                                                <%= inFormat.format(proPrice) %>
                                             </td>
                                             <td class="column-4">
                                                 <div class="wrap-num-product flex-w m-l-auto m-r-0">
@@ -88,7 +91,8 @@
                                                 </div>
                                             </td>
                                             <td class="column-5"><span class="<%= proData.productId._id %>">
-                                                    <%= proData.totalProductAmount %>
+                                                    <% const totalAmount = proData.totalProductAmount %>
+                                                    <%= inFormat.format(totalAmount) %>
                                                 </span></td>
                                         </tr>
 
@@ -101,7 +105,7 @@
                                 </table>
                             </div>
 
-                            <div class="flex-w flex-sb-m bor15 p-t-18 p-b-15 p-lr-40 p-lr-15-sm cartBody">
+                            <!-- <div class="flex-w flex-sb-m bor15 p-t-18 p-b-15 p-lr-40 p-lr-15-sm cartBody">
                                 <div class="flex-w flex-m m-r-20 m-tb-5">
                                     <input class="stext-104 cl2 plh4 size-117 bor13 p-lr-20 m-r-10 m-tb-5" type="text"
                                         name="coupon" placeholder="Coupon Code">
@@ -116,7 +120,7 @@
                                     class="flex-c-m stext-101 cl2 size-119 bg8 bor13 hov-btn3 p-lr-15 trans-04 pointer m-tb-10">
                                     Update Cart
                                 </div>
-                            </div>
+                            </div> -->
                         </div>
                     </div>
 
@@ -127,7 +131,7 @@
                                 Cart Totals
                             </h4>
 
-                            <div class="flex-w flex-t bor12 p-b-13" id="cartTotal">
+                            <div class="flex-w flex-t bor12 p-b-13 mb-4" id="cartTotal">
                                 <div class="size-208">
                                     <span class="stext-110 cl2">
                                         Total cart amount :
@@ -136,53 +140,12 @@
 
                                 <div class="size-209">
                                     <span class="mtext-110 cl2" id="subtotalSpan" >
-                                        <%= proData.totalCartAmount %>
+                                        <% const totalCartAmount = proData.totalCartAmount %>
+                                        <%= inFormat.format(totalCartAmount) %>
                                     </span>
                                 </div>
                             </div>
-                            <!----------------coupon details------------>
-                            <div class="flex-w flex-t bor12 p-t-15 p-b-30">
-                                <!-- <div class="size-208 w-full-ssm">
-                                    <span class="stext-110 cl2">
-                                        Shipping:
-                                    </span>
-                                </div> -->
-
-                                <!-- <div class="size-209 p-r-18 p-r-0-sm w-full-ssm"> -->
-
-                                    <div class="formDiv">
-                                        <form action="/redeemCoupon" method="POST" id="couponForm">
-                                            <div class="mb-3">
-                                                <label for="exampleInputEmail1" class="form-label">Redeem coupon</label>
-                                                <input type="text" class="form-control" id="exampleInputEmail1"
-                                                    aria-describedby="emailHelp" name="couponCode">
-                                            </div>
-                                            <button type="submit" id="formButton"
-                                                class="btn btn-primary">Redeem</button>
-                                        </form>
-                                    </div>
-                                    <div class="alert alert-warning mt-4" role="alert" style="display: none;"
-                                        id="alertDiv">
-                                    </div>
-                                    
-
-                                <!-- </div> -->
-                            </div>
-
-
-                            <div class="flex-w flex-t p-t-27 p-b-33" id="newCartAmount">
-                                <div class="size-208">
-                                    <span class="mtext-101 cl2">
-                                        Total:
-                                    </span>
-                                </div>
-    
-                                <div class="size-209 p-t-1">
-                                    <span class="mtext-110 cl2" id="netTotal">
-                                        <%= proData.totalCartAmount %>
-                                    </span>
-                                </div>
-                            </div>
+                            
                             <% if(proData.totalCartAmount !==0){ %>
                                 <div class="checkout" style="display : block">
                                     <a href="/viewCheckoutPage" id="proceedButton">
@@ -213,136 +176,128 @@
 
 
         <!-- Footer -->
-        <footer class="bg3 p-t-75 p-b-32">
-            <div class="container">
-                <div class="row">
-                    <div class="col-sm-6 col-lg-3 p-b-50">
-                        <h4 class="stext-301 cl0 p-b-30">
-                            Categories
-                        </h4>
+	<footer class="bg3 p-t-50 p-b-32 mt-5">
+		<div class="container">
+			<div class="row">
+				<div class="col-sm-6 col-lg-3 p-b-30">
 
-                        <ul>
-                            <li class="p-b-10">
-                                <a href="#" class="stext-107 cl7 hov-cl1 trans-04">
-                                    Women
-                                </a>
-                            </li>
+					<h4 class="stext-301 cl0 p-b-30">
+						Categories
+					</h4>
 
-                            <li class="p-b-10">
-                                <a href="#" class="stext-107 cl7 hov-cl1 trans-04">
-                                    Men
-                                </a>
-                            </li>
+					<ul>
+						<% catData.forEach((data) =>{ %>
+							<li class="p-b-10">
+								<a href="/viewAllProducts/<%=data._id %>" class="stext-107 cl7 hov-cl1 trans-04">
+									<%=data.name %>
+								</a>
+							</li>
+						<% }) %>
+					</ul>
 
-                            <li class="p-b-10">
-                                <a href="#" class="stext-107 cl7 hov-cl1 trans-04">
-                                    Shoes
-                                </a>
-                            </li>
+				</div>
 
-                            <li class="p-b-10">
-                                <a href="#" class="stext-107 cl7 hov-cl1 trans-04">
-                                    Watches
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
+				<div class="col-sm-6 col-lg-3 p-b-30">
+					<h4 class="stext-301 cl0 p-b-30">
+						Help
+					</h4>
 
-                    <div class="col-sm-6 col-lg-3 p-b-50">
-                        <h4 class="stext-301 cl0 p-b-30">
-                            Help
-                        </h4>
+					<ul>
 
-                        <ul>
-                            <li class="p-b-10">
-                                <a href="#" class="stext-107 cl7 hov-cl1 trans-04">
-                                    Track Order
-                                </a>
-                            </li>
+						<li class="p-b-10">
+							<a href="#" class="stext-107 cl7 hov-cl1 trans-04">
+								Shipping
+							</a>
+						</li>
 
-                            <li class="p-b-10">
-                                <a href="#" class="stext-107 cl7 hov-cl1 trans-04">
-                                    Returns
-                                </a>
-                            </li>
+						<li class="p-b-10">
+							<a href="#" class="stext-107 cl7 hov-cl1 trans-04">
+								FAQs
+							</a>
+						</li>
+					</ul>
+				</div>
 
-                            <li class="p-b-10">
-                                <a href="#" class="stext-107 cl7 hov-cl1 trans-04">
-                                    Shipping
-                                </a>
-                            </li>
+				<div class="col-sm-6 col-lg-3 p-b-30">
+					<h4 class="stext-301 cl0 p-b-30">
+						GET IN TOUCH
+					</h4>
 
-                            <li class="p-b-10">
-                                <a href="#" class="stext-107 cl7 hov-cl1 trans-04">
-                                    FAQs
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
+					<p class="stext-107 cl7 size-201">
+						Any questions? Let us know in store at 8th floor, 379 Hudson St, New York, NY 10018 or call us on (+1) 96 716 6879
+					</p>
 
-                    <div class="col-sm-6 col-lg-3 p-b-50">
-                        <h4 class="stext-301 cl0 p-b-30">
-                            GET IN TOUCH
-                        </h4>
+					<div class="p-t-27">
+						<a href="http://www.facebook.com" target="_blank" class="fs-18 cl7 hov-cl1 trans-04 m-r-16">
+							<i class="fa fa-facebook"></i>
+						</a>
 
-                        <p class="stext-107 cl7 size-201">
-                            Any questions? Let us know in store at 8th floor, 379 Hudson St, New York, NY 10018 or call
-                            us on (+1) 96 716 6879
-                        </p>
+						<a href="http://www.instagram.com" target="_blank" class="fs-18 cl7 hov-cl1 trans-04 m-r-16">
+							<i class="fa fa-instagram"></i>
+						</a>
 
-                        <div class="p-t-27">
-                            <a href="#" class="fs-18 cl7 hov-cl1 trans-04 m-r-16">
-                                <i class="fa fa-facebook"></i>
-                            </a>
+						<a href="http://www.pinterest.com" target="_blank" class="fs-18 cl7 hov-cl1 trans-04 m-r-16">
+							<i class="fa fa-pinterest-p"></i>
+						</a>
+					</div>
+				</div>
 
-                            <a href="#" class="fs-18 cl7 hov-cl1 trans-04 m-r-16">
-                                <i class="fa fa-instagram"></i>
-                            </a>
+				<div class="col-sm-6 col-lg-3 p-b-30">
+					<h4 class="stext-301 cl0 p-b-30">
+						Newsletter
+					</h4>
 
-                            <a href="#" class="fs-18 cl7 hov-cl1 trans-04 m-r-16">
-                                <i class="fa fa-pinterest-p"></i>
-                            </a>
-                        </div>
-                    </div>
+					<form>
+						<div class="wrap-input1 w-full p-b-4">
+							<input class="input1 bg-none plh1 stext-107 cl7" type="text" name="email" placeholder="email@example.com">
+							<div class="focus-input1 trans-04"></div>
+						</div>
 
-                </div>
+						<div class="p-t-18">
+							<button class="flex-c-m stext-101 cl0 size-103 bg1 bor1 hov-btn2 p-lr-15 trans-04">
+								Subscribe
+							</button>
+						</div>
+					</form>
+				</div>
+			</div>
 
-                <div class="p-t-40">
-                    <div class="flex-c-m flex-w p-b-18">
-                        <a href="#" class="m-all-1">
-                            <img src="images/icons/icon-pay-01.png" alt="ICON-PAY">
-                        </a>
+			<div class="p-t-40">
+				<div class="flex-c-m flex-w p-b-18">
+					<a href="#" class="m-all-1">
+						<img src="user_assets/images/icons/icon-pay-01.png" alt="ICON-PAY">
+					</a>
 
-                        <a href="#" class="m-all-1">
-                            <img src="images/icons/icon-pay-02.png" alt="ICON-PAY">
-                        </a>
+					<a href="#" class="m-all-1">
+						<img src="user_assets/images/icons/icon-pay-02.png" alt="ICON-PAY">
+					</a>
 
-                        <a href="#" class="m-all-1">
-                            <img src="images/icons/icon-pay-03.png" alt="ICON-PAY">
-                        </a>
+					<a href="#" class="m-all-1">
+						<img src="user_assets/images/icons/icon-pay-03.png" alt="ICON-PAY">
+					</a>
 
-                        <a href="#" class="m-all-1">
-                            <img src="images/icons/icon-pay-04.png" alt="ICON-PAY">
-                        </a>
+					<a href="#" class="m-all-1">
+						<img src="user_assets/images/icons/icon-pay-04.png" alt="ICON-PAY">
+					</a>
 
-                        <a href="#" class="m-all-1">
-                            <img src="images/icons/icon-pay-05.png" alt="ICON-PAY">
-                        </a>
-                    </div>
+					<a href="#" class="m-all-1">
+						<img src="user_assets/images/icons/icon-pay-05.png" alt="ICON-PAY">
+					</a>
+				</div>
 
-                    <p class="stext-107 cl6 txt-center">
-                        <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-                        Copyright &copy;
-                        <script>document.write(new Date().getFullYear());</script> All rights reserved
-                        <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+				<p class="stext-107 cl6 txt-center">
+					<!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | Pedals India</a>
+<!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
 
-                    </p>
-                </div>
-            </div>
-        </footer>
+				</p>
+			</div>
+		</div>
+	</footer>
         </div>
 
         <script>
+            const inFormat = new Intl.NumberFormat('en-IN' , {style : 'currency' , currency : 'INR'})
 
             function changeQuantity(proId, proPrice, count) {
                 const proQuantity = document.getElementById(proId).innerHTML
@@ -363,8 +318,9 @@
                         success: (response) => {
                             console.log('this is response in ajaxxx', response);
                             document.getElementById(proId).innerHTML = parseInt(proQuantity) + count
-                            document.getElementsByClassName(proId)[0].innerHTML = response.totalProductAmount
-                            document.getElementById('cartTotal').innerHTML = response.totalCartAmount
+                            document.getElementsByClassName(proId)[0].innerHTML = inFormat.format(response.totalProductAmount) 
+                            document.getElementById('subtotalSpan').innerHTML = inFormat.format(response.totalCartAmount) 
+                            document.getElementById('netTotal').innerHTML = inFormat.format(response.totalCartAmount) 
                         }
                     })
                 }
@@ -414,51 +370,6 @@
                 }, 2000)
             }
 
-            /*--------redeeming coupon---------*/
-            const form = document.getElementById('couponForm')
-            const input = form.querySelector('input')
-            form.addEventListener('submit', async (event) => {
-                event.preventDefault()
-                if (input.value == "") {
-                    displayError('Please enter a coupon code!!')
-                } else {
-                    console.log("called fetch method");
-                    const url = "/redeemCoupon";
-                    const formData = new FormData(form);
-                    try {
-                        const response = await fetch(url, {
-                            method: "POST",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify(Object.fromEntries(formData)),
-                        });
-                        const data = await response.json();
-                        if (data.error) {
-                            displayError(data.error);
-                        } else if (data.redeemedCoupon) {
-                            displayError(data.redeemedCoupon);
-                        } else if (data.claimed) {
-                            displayError(data.claimed);
-                        } else if (data.minimumAmount) {
-                            displayError(data.minimumAmount);
-                        } else if (data.couponExpired) {
-                            displayError(data.couponExpired);
-                        } else {
-                            displayError(data.message);
-                            // $('#cartTotal').html(data.oldCartAmountt)
-                            // $('#cartTotal').load('/viewCart #cartTotal')
-                            console.log('this is old cart amount ' , data.oldCartAmount);
-                            console.log('this is new cart amount ' , data.newTotalCartAmount);
-                            $('#netTotal').html(data.newTotalCartAmount)
-                            $('#subtotalSpan').html(data.oldCartAmount)
-
-                        }
-                        form.reset();
-                    } catch (error) {
-                        console.log(error);
-                    }
-                }
-
-            })
         </script>
 
 

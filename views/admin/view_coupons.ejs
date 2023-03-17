@@ -10,7 +10,7 @@
         <h1>Coupons</h1>
         <nav>
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="index.html">Admin</a></li>
+                <li class="breadcrumb-item"><a href="index.html">Home</a></li>
                 <li class="breadcrumb-item active">Coupons</li>
             </ol>
         </nav>
@@ -35,6 +35,7 @@
                                     <th scope="col">Minimum purchase amount</th>
                                     <th scope="col">Maximum discount amount</th>
                                     <th scope="col">Percentage discount</th>
+                                    <th scope="col">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -47,6 +48,9 @@
                                         <td><%= couponData.minPurchaseAmount %></td>
                                         <td><%=couponData.maxDiscount %></td>
                                         <td><%=couponData.percentageDiscount %></td>
+                                        <td>
+                                            <button class="btn btn-warning " type="button" onclick="deleteCoupon('<%= couponData._id %>')" id="deleteCouponButton">Delete</button>
+                                        </td>
                                     </tr>
                                 <% }) %>
                             </tbody>
@@ -112,14 +116,14 @@
 </main><!-- End #main -->
 
 <script>
-    
+
     const form = document.getElementById('couponForm')
     const inputs = form.querySelectorAll('input')
-    
-    form.addEventListener('submit' , (event) =>{
+
+    form.addEventListener('submit', (event) => {
         event.preventDefault()
         let nullFields = false
-        for(let i = 0; i < inputs.length; i ++){
+        for (let i = 0; i < inputs.length; i++) {
             if (inputs[i].value == "") {
                 nullFields = true
                 $('#alertDiv').show().html("All fields are required!!")
@@ -131,34 +135,81 @@
         }
         console.log('checked nullfields ');
         /*------Empty fields checking------*/
-        if(!nullFields){
+        if (!nullFields) {
             console.log('entering  to false case');
             const url = '/admin/addCoupon'
             const formData = new FormData(form)
             fetch(url,
                 {
-                    method : 'post',
-                    headers : {'Content-Type' : 'application/json'},
-                    body : JSON.stringify(Object.fromEntries(formData))
+                    method: 'post',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(Object.fromEntries(formData))
                 }
             )
-            .then(async (response) =>{
-                const message = await response.json()
-                console.log('this is response in fetchhhh' , message.response);
-                Swal.fire({
-                position: 'bottom-end',
-                icon: 'success',
-                title: message.response,
-                showConfirmButton: false,
-                timer: 2000
+                .then(async (response) => {
+                    const message = await response.json()
+                    console.log('this is response in fetchhhh', message.response);
+                    Swal.fire({
+                        position: 'bottom-end',
+                        icon: 'success',
+                        title: message.response,
+                        showConfirmButton: false,
+                        timer: 2000
+                    })
+
+                    $('#reloadSection').load('/admin/viewCoupons #reloadSection')
+                    $('#addCouponModal').modal('hide')
                 })
-                
-                $('#reloadSection').load('/admin/viewCoupons #reloadSection')
-                $('#addCouponModal').modal('hide')
-            })
-            
+
         }
     })
+
+    /*-----delete coupon-----*/
+    let deleteCoupon = (couponId) => {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You want to delete the coupon?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes !'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const url = `/admin/deleteCoupon`;
+                const data = { couponId: couponId };
+                const json = JSON.stringify(data);
+
+                fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: json
+                })
+                    .then((response) => {
+                        return response.json();
+                    })
+                    .then(async (data) => {
+                        await Swal.fire({
+                            position: 'top-end',
+                            icon: 'success',
+                            title: 'Deleted the coupon',
+                            showConfirmButton: false,
+                            timer: 2000
+                        })
+
+                        setTimeout(() =>{
+                            $('#reloadSection').load('/admin/viewCoupons #reloadSection')
+                        } , 500 )
+                    })
+                    .catch((error) => {
+                        console.error(error);
+                    });
+            }
+        });
+    };
+
+
+
 
     /*------Preventing the escape closing of modal-----*/
     $(document).ready(function () {
@@ -167,8 +218,8 @@
             keyboard: false
         });
     });
- 
-    
+
+
 </script>
 
 

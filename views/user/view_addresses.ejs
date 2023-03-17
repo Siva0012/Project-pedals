@@ -1,7 +1,7 @@
 <%- include('../layout/user/user_header.ejs') %>
 <%- include('../user/user_nav.ejs') %>
 
-<section style="background-color: #eee;">
+<section style="background-color: #eee;" id="reloadDiv">
     <div class="container py-5">
 
       <div class="row">
@@ -16,9 +16,11 @@
         <div class="col">
           <nav aria-label="breadcrumb" class="bg-light rounded-3 p-3 mb-4">
 
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="@mdo">Add a new address</button>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#insertModal" data-bs-whatever="@mdo">Add a new address</button>
             <!-- <a href=""><h1 class="breadcrumb mb-0 text-primary"> Add a new address</h1></a> -->
-            <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+
+            <!--Modal for insert address-->
+            <div class="modal fade" id="insertModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
               <div class="modal-dialog">
                 <div class="modal-content">
                   <div class="modal-header">
@@ -26,7 +28,8 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                   </div>
                   <div class="modal-body">
-                    <form method="post" action="/insertAddress">
+
+                    <form method="post" action="/insertAddress" id="insertForm">
 
                       <div class="mb-3">
                         <label for="recipient-name" class="col-form-label">Name</label>
@@ -63,6 +66,10 @@
                       </div>
 
                     </form>
+                    <div class="alert alert-warning mt-3" role="alert" id="alertDiv" style="display: none;">
+
+                    </div>
+
                   </div>
                   
                 </div>
@@ -73,124 +80,200 @@
           </nav>
         </div>
       </div>
-    <% userData.addresses.forEach((addresses) =>{ %>
-      <div class="row">
-        
-        <div class="col">
-          <div class="card mb-4">
-            <div class="card-body">
-              <div class="row">
-                <div class="col-sm-3">
-                  <div class="details d-flex flex-column justify-content-between">
-                    <p class="mb-0"><%= addresses.name %></p>
-                    <p class="mb-0"><%= addresses.phone %></p>
-                  </div>
-                </div>
-                <div class="col-sm-9">
-                  <div class="add-wrapper d-flex justify-content-between">
-                    <div class="address">
-                      <p class="text-muted mb-0"><%= addresses.addressline %></p>
-                      <p class="text-muted mb-0"><span><%=addresses.city %> &nbsp; </span><%= addresses.state%><span> &nbsp; <span> <%= addresses.pincode %></span></p>
+      <div id="null">
+        <% userData.addresses.forEach((addresses) =>{ %>
+          <div class="row">
+            
+            <div class="col">
+              <div class="card mb-4">
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-sm-3">
+                      <div class="details d-flex flex-column justify-content-between">
+                        <p class="mb-0"><%= addresses.name %></p>
+                        <p class="mb-0"><%= addresses.phone %></p>
+                      </div>
                     </div>
-                    <div class="dropdown">
-                      <button href="" class="text-muted btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fa fa-ellipsis-vertical"></i>
-                      </button>
-                      <ul class="dropdown-menu">
+                    <div class="col-sm-9">
+                      <div class="add-wrapper d-flex justify-content-between">
+                        <div class="address">
+                          <p class="text-muted mb-0"><%= addresses.addressline %></p>
+                          <p class="text-muted mb-0"><span><%=addresses.city %> &nbsp; </span><%= addresses.state%><span> &nbsp; <span> <%= addresses.pincode %></span></p>
+                        </div>
+                        <div class="dropdown">
+                          <button href="" class="text-muted btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fa fa-ellipsis-vertical"></i>
+                          </button>
+                          <ul class="dropdown-menu">
+                            
+                            <li><button type="button" data-bs-toggle="modal" data-bs-target="#<%=addresses._id%>" data-bs-whatever="@mdo">Edit</button></li>
+                            <li><button type="button" class="dropdown-item" onclick="deleteAddress('<%= addresses._id %>')">Delete</button></li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+    
+                  <!--Modal-->
+                  <div class="modal fade" id="<%= addresses._id%>" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h1 class="modal-title fs-5" id="exampleModalLabel">Edit address</h1>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                          <form method="post" action="/editAddress" id="addressForm">
+      
+                            <div class="mb-3">
+                              <label for="recipient-name" class="col-form-label">Name</label>
+                              <input type="text" class="form-control" id="recipient-name" name="name" value="<%=addresses.name %>">
+                            </div>
+                            <div class="mb-3">
+                              <label for="recipient-name" class="col-form-label">Mobile number</label>
+                              <input type="text" class="form-control" id="recipient-name" name="phone" value="<%=addresses.phone %>">
+                            </div>
+                            <div class="mb-3">
+                              <label for="message-text" class="col-form-label">Addressline</label>
+                              <textarea class="form-control" id="message-text" name="addressline"><%= addresses.addressline %></textarea>
+                            </div>
+                            <div class="mb-3">
+                              <label for="recipient-name" class="col-form-label">City</label>
+                              <input type="text" class="form-control" id="recipient-name" name="city" value="<%=addresses.city %>">
+                            </div>
+                            <div class="mb-3">
+                              <label for="recipient-name" class="col-form-label">State</label>
+                              <input type="text" class="form-control" id="recipient-name" name="state" value="<%=addresses.state %>">
+                            </div>
+                            <div class="mb-3">
+                              <label for="recipient-name" class="col-form-label">Pincode</label>
+                              <input type="text" class="form-control" id="recipient-name" name="pincode" value="<%=addresses.pincode %>">
+                            </div>
+                            <div class="mb-3">
+                              <label for="recipient-name" class="col-form-label">Alternate phone</label>
+                              <input type="text" class="form-control" id="recipient-name" name="alternatePhone" value="<%=addresses.alternatePhone %>">
+                            </div>
+                            <div class="mb-3 d-none">
+                              <label for="recipient-name" class="col-form-label">Alternate phone</label>
+                              <input type="text" class="form-control" id="recipient-name" name="addressId" value="<%=addresses._id %>">
+                            </div>
+      
+                            <div class="text-align-end">
+                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                              <button type="submit" class="btn btn-primary">Edit address</button>
+                            </div>
+      
+                          </form>
+                          
+                        </div>
                         
-                        <li><button type="button" data-bs-toggle="modal" data-bs-target="#<%=addresses._id%>" data-bs-whatever="@mdo">Edit</button></li>
-                        <li><a href="/deleteAddress/<%= addresses._id %>" class="dropdown-item">Delete</a></li>
-                      </ul>
+                      </div>
                     </div>
                   </div>
+    
+                  
                 </div>
               </div>
-
-              <!--Modal-->
-              <div class="modal fade" id="<%= addresses._id%>" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                  <div class="modal-content">
-                    <div class="modal-header">
-                      <h1 class="modal-title fs-5" id="exampleModalLabel">Edit address</h1>
-                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                      <form method="post" action="/editAddress">
-  
-                        <div class="mb-3">
-                          <label for="recipient-name" class="col-form-label">Name</label>
-                          <input type="text" class="form-control" id="recipient-name" name="name" value="<%=addresses.name %>">
-                        </div>
-                        <div class="mb-3">
-                          <label for="recipient-name" class="col-form-label">Mobile number</label>
-                          <input type="text" class="form-control" id="recipient-name" name="phone" value="<%=addresses.phone %>">
-                        </div>
-                        <div class="mb-3">
-                          <label for="message-text" class="col-form-label">Addressline</label>
-                          <textarea class="form-control" id="message-text" name="addressline"><%= addresses.addressline %></textarea>
-                        </div>
-                        <div class="mb-3">
-                          <label for="recipient-name" class="col-form-label">City</label>
-                          <input type="text" class="form-control" id="recipient-name" name="city" value="<%=addresses.city %>">
-                        </div>
-                        <div class="mb-3">
-                          <label for="recipient-name" class="col-form-label">State</label>
-                          <input type="text" class="form-control" id="recipient-name" name="state" value="<%=addresses.state %>">
-                        </div>
-                        <div class="mb-3">
-                          <label for="recipient-name" class="col-form-label">Pincode</label>
-                          <input type="text" class="form-control" id="recipient-name" name="pincode" value="<%=addresses.pincode %>">
-                        </div>
-                        <div class="mb-3">
-                          <label for="recipient-name" class="col-form-label">Alternate phone</label>
-                          <input type="text" class="form-control" id="recipient-name" name="alternatePhone" value="<%=addresses.alternatePhone %>">
-                        </div>
-                        <div class="mb-3 d-none">
-                          <label for="recipient-name" class="col-form-label">Alternate phone</label>
-                          <input type="text" class="form-control" id="recipient-name" name="addressId" value="<%=addresses._id %>">
-                        </div>
-  
-                        <div class="text-align-end">
-                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                          <button type="submit" class="btn btn-primary">Edit address</button>
-                        </div>
-  
-                      </form>
-                    </div>
-                    
-                  </div>
-                </div>
-              </div>
-
-              <!-- <div class="row">
-                <div class="col-sm-3">
-                  <div class="details">
-                    <p class="mb-0">Full Name</p>
-                    <p class="mb-0">Mobile number</p>
-                  </div>
-                </div>
-                <div class="col-sm-9">
-                  <div class="add-wrapper d-flex justify-content-between">
-                    <div class="address">
-                      <p class="text-muted mb-0">Lorem ipsum, dolor sit amet consectetur adipisicing elit. Nemo nihil earum, consectetur eligendi quia odit libero! Ipsam, adipisci voluptatem asperiores error nostrum quaerat tenetur enim!</p>
-                    </div>
-                    <div class="dropdown">
-                      <button href="" class="text-muted btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fa fa-ellipsis-vertical"></i>
-                      </button>
-                      <ul class="dropdown-menu">
-                        <li> <a href="" class="dropdown-item">Edit</a></li>
-                        <li> <a href="" class="dropdown-item">Delete</a></li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              </div> -->
-            </div>
           </div>
+        </div>
+        <% }) %>
       </div>
-    </div>
-    <% }) %>
       
   </section>
+  
+  <script>
+    const form = document.getElementById('insertForm')
+    const inputs = form.querySelectorAll('input')
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault()
+      let nullFields = false
+      for (let i = 0; i < inputs.length; i++) {
+        if (inputs[i].value == "") {
+          nullFields = true
+          $('#alertDiv').show().html("All fields are required!!")
+          setTimeout(() => {
+            $('#alertDiv').fadeOut('slow')
+          }, 1500)
+          break
+        }
+      }
+      console.log('checked nullfields ');
+      /*------Empty fields checking------*/
+      if (!nullFields) {
+        console.log('entering  to false case');
+        const url = '/insertAddress'
+        const formData = new FormData(form)
+        fetch(url,
+          {
+            method: 'post',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(Object.fromEntries(formData))
+          }
+        )
+          .then(async (response) => {
+            const message = await response.json()
+            Swal.fire({
+              position: 'bottom-end',
+              icon: 'success',
+              title: "Address added",
+              showConfirmButton: false,
+              timer: 2000
+            })
+
+            $('#reloadDiv').load('/viewAddresses #reloadDiv')
+            console.log('reloaded');
+            $('#insertModal').modal('hide')
+          })
+
+      }
+    })
+
+    let deleteAddress = (addressId) => {
+
+      Swal.fire({
+        title: 'Are you sure?',
+        text: "You want to delete the product from the cart?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes !'
+      })
+        .then((result) => {
+          if (result.isConfirmed) {
+            $.ajax(
+              {
+                url: `/deleteAddress/${addressId}`,
+                method: "GET",
+                data: null,
+                success: (response) => {
+                  if (response.success) {
+                    Swal.fire({
+                      title: 'Deleted!',
+                      text: 'Address deleted',
+                      icon: 'success',
+                      showConfirmButton: false
+                    })
+                    setTimeout(() => {
+                      Swal.close()
+                      $('#reloadDiv').load('/viewAddresses #reloadDiv')
+                    }, 2000)
+                  }
+                }
+              }
+            )
+          }
+        })
+
+    }
+
+
+
+  </script>
+
+
+
+
+
   <%- include('../layout/user/user_footer.ejs') %>

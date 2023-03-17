@@ -2,24 +2,339 @@
 <%- include('../admin/navbar.ejs')  %> 
 <%- include('../admin/sidebar.ejs')  %> 
 
+<% const inFormat = new Intl.NumberFormat('en-IN' , {style : 'currency' , currency : 'INR'}) %>
+<main id="main" class="main">
+
+  <div class="pagetitle">
+    <h1>Dashboard</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+        <li class="breadcrumb-item active">Dashboard</li>
+      </ol>
+    </nav>
+  </div><!-- End Page Title -->
+
+  <section class="section dashboard">
+    <div class="row">
+
+      <!-- Left side columns -->
+      <div class="col-lg-12">
+        <div class="row">
+
+          <!-- Sales Card -->
+          <div class="col-xxl-6 col-md-6">
+            <div class="card info-card sales-card">
+
+              <div class="filter">
+                <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
+                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+                  <li class="dropdown-header text-start">
+                    <h6>Filter</h6>
+                  </li>
+
+                  <li><a class="dropdown-item" href="#">Today</a></li>
+                  <li><a class="dropdown-item" href="#">This Month</a></li>
+                  <li><a class="dropdown-item" href="#">This Year</a></li>
+                </ul>
+              </div>
+
+              <div class="card-body">
+                <h5 class="card-title">Sales <span>| Today</span></h5>
+
+                <div class="d-flex align-items-center">
+                  <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                    <i class="bi bi-cart"></i>
+                  </div>
+                  <div class="ps-3">
+                    <h6><%= totalSales %></h6>
+                    <!-- <span class="text-success small pt-1 fw-bold">12%</span> <span class="text-muted small pt-2 ps-1">increase</span> -->
+
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div><!-- End Sales Card -->
+
+          <!-- Revenue Card -->
+          <div class="col-xxl-6 col-md-6">
+            <div class="card info-card revenue-card">
+
+              <div class="filter">
+                <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
+                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+                  <li class="dropdown-header text-start">
+                    <h6>Filter</h6>
+                  </li>
+
+                  <li><a class="dropdown-item" href="#">Today</a></li>
+                  <li><a class="dropdown-item" href="#">This Month</a></li>
+                  <li><a class="dropdown-item" href="#">This Year</a></li>
+                </ul>
+              </div>
+
+              <div class="card-body">
+                <h5 class="card-title">Revenue <span>| This Month</span></h5>
+
+                <div class="d-flex align-items-center">
+                  <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                    <i class="bi bi-currency-dollar"></i>
+                  </div>
+                  
+
+                    <div class="ps-3">
+                      <h6><%= inFormat.format(revenue) %></h6>
+                      <!-- <span class="text-success small pt-1 fw-bold">8%</span> <span class="text-muted small pt-2 ps-1">increase</span> -->
   
+                    </div>
+                 
+                </div>
+              </div>
 
+            </div>
+          </div><!-- End Revenue Card -->
+
+          
+
+          <!-- Reports -->
+          <div class="col-8">
+            <div class="card">
+
+              <div class="filter">
+                <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
+                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+                  <li class="dropdown-header text-start">
+                    <h6>Filter</h6>
+                  </li>
+
+                  <li><a class="dropdown-item" href="#">Today</a></li>
+                  <li><a class="dropdown-item" href="#">This Month</a></li>
+                  <li><a class="dropdown-item" href="#">This Year</a></li>
+                </ul>
+              </div>
+
+              <div class="card-body">
+                <h5 class="card-title">Reports <span>/This week</span></h5>
+
+                <!-- Line Chart -->
+                  <div id="reportsChart"></div>
+                
+                
+              </div>
+
+            </div>
+          </div><!-- End Reports -->
+
+          <div class="col-4">
+
+            <div class="card">
   
-
-  <main id="main" class="main">
-
-    <div class="pagetitle">
-      <h1>Dashboard</h1>
-      <nav>
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-          <li class="breadcrumb-item active">Dashboard</li>
-        </ol>
-      </nav>
-    </div><!-- End Page Title -->
-
-  </main><!-- End #main -->
-
+              <div class="filter">
+                <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
+                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+                  <li class="dropdown-header text-start">
+                    <h6>Filter</h6>
+                  </li>
   
+                  <li><a class="dropdown-item" href="#">Today</a></li>
+                  <li><a class="dropdown-item" href="#">This Month</a></li>
+                  <li><a class="dropdown-item" href="#">This Year</a></li>
+                </ul>
+              </div>
+  
+              <div class="card-body">
+                <h5 class="card-title">Payments<span>/This week</span></h5>
+  
+                <!-- Donut chart -->
+                  <div id="paymentChart"></div>
+              </div>
+  
+            </div>
+
+          </div> <!--Payment chart ends here-->
+
+          <!-- Recent Sales -->
+          <div class="col-12">
+            <div class="card recent-sales overflow-auto">
+
+              <div class="card-body">
+                <h5 class="card-title">Recent Sales <span>| Last seven days</span></h5>
+                
+                  <table class="table" id="recentSalesTable">
+
+                    <thead>
+                      <tr>
+                        <th scope="col">No</th>
+                        <th scope="col">Order id</th>
+                        <th scope="col">Order date</th>
+                        <th scope="col">User name</th>
+                        <th scope="col">Bill amount</th>
+                        <th scope="col">Payment type</th>
+                        <th scope="col">Status</th>
+                      </tr>
+                    </thead>
+
+                    <tbody>
+                        <% recentData.forEach((data , i) =>{ %>
+                        <tr>
+                          <th scope="row"> <%= i +1 %></th>
+                          <td><%= data.orderId %></td>
+                          <td><%= moment(data.date).format("MMM Do YY") %></td>
+                          <td><%= data.user.userName %></td>
+                          <% const total = data.total %>
+                          <td><%= inFormat.format(total) %></td>
+                          <td><%= data.paymentType %></td>
+                          <td><%= data.status %></td>
+                        </tr>
+                        <% }) %>
+                    </tbody>
+
+                  </table>
+
+              </div>
+
+            </div>
+          </div><!-- End Recent Sales -->
+
+          
+
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+</main><!-- End #main -->
+
+
+
+<script>
+  
+  /*------Sales chart-------*/
+    let options = {
+      series: [
+        {
+          name: "Sales",
+          data: [100 , 150 , 90 , 350 , 240 , 120]
+        }
+      ],
+      chart: {
+        height: 350,
+        type: 'line',
+        toolbar: {
+          show: false
+        },
+      },
+      markers: {
+        size: 4
+      },
+      colors: ['#4154f1'],
+      fill: {
+        type: "gradiant",
+        gradient: {
+          shadeIntensity: 1,
+          opacityFrom: 0.3,
+          opacityTo: 0.4,
+          stops: [0, 90, 100]
+        }
+      },
+      dataLabels: {
+        enabled: false
+      },
+      stroke: {
+        curve: 'smooth',
+        width: 2
+      },
+      xaxis: {
+        type: 'date',
+        categories: ["01/03/2023", "02/03/2023", "03/03/2023", "04/03/2023", "05/03/2023", "06/03/2023", "07/03/2023"]
+      },
+      tooltip: {
+        x: {
+          format: 'dd/MM/yy'
+        },
+      }
+    }
+
+  const chart = new ApexCharts(document.querySelector("#reportsChart") , options)
+  document.addEventListener("DOMContentLoaded" , () =>{
+    chart.render()
+  })
+
+  let updateChart = () => {
+      $.ajax({
+        url: '/admin/updateChart',
+        method: "GET",
+        data : null,
+        success: (response) => {
+          let data = response.salesPerDay
+          const catData  = data.map(( data => data._id))
+          const seriesData = data.map((data => data.sales))
+          options.series[0].data = seriesData
+          options.xaxis.categories = catData
+          chart.updateOptions(options)
+        }
+      })
+    }
+    updateChart()
+
+  // /*------Payment chart-----*/
+  document.addEventListener("DOMContentLoaded" , () =>{
+    
+        let options = {
+              series: [44, 55, 13, 43, 22],
+              chart: {
+              width: 350,
+              type: 'pie',
+            },
+            labels: ['Team A', 'Team B', 'Team C', 'Team D', 'Team E'],
+            responsive: [{
+              breakpoint: 480,
+              options: {
+                chart: {
+                  width: 200
+                },
+                legend: {
+                  position: 'bottom'
+                }
+              }
+            }]
+            };
+            const chart = new ApexCharts(document.querySelector("#paymentChart"), options);
+            chart.render();
+            
+            let updateDonut = () =>{
+              $.ajax(
+                {
+                  url : '/admin/updateDonut',
+                  method : 'GET',
+                  data : null,
+                  success: (response) => {
+                    console.log(response);
+                    let seriesData = response.map(value => value.count)
+                    let labelData = response.map(value => value._id)
+                    options.series = seriesData
+                    options.labels = labelData
+                    chart.updateOptions(options)
+                  }
+                }
+                )
+              }
+
+            updateDonut()
+
+            // const recentSalesTable = document.getElementById("recentSalesTable")
+            // recentSalesTable.Datatable()
+            // console.log('table' , recentSalesTable);
+            let table = new DataTable('#recentSalesTable');
+
+  })
+  
+    
+</script>
+
+
   <%- include('../layout/admin/admin_footer.ejs')  %> 
  

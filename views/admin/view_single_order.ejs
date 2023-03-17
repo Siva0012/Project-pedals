@@ -1,106 +1,122 @@
-<%- include('../layout/admin/admin_header.ejs')  %> 
-<%- include('../admin/navbar.ejs')  %> 
-<%- include('../admin/sidebar.ejs')  %> 
+<%- include('../layout/admin/admin_header.ejs') %>
+  <%- include('../admin/navbar.ejs') %>
+    <%- include('../admin/sidebar.ejs') %>
 
+      <% const inFormat=new Intl.NumberFormat('en-IN' , {style : 'currency' , currency : 'INR' }) %>
 
-<main id="main" class="main">
+        <main id="main" class="main">
 
-    <div class="pagetitle">
-      <h1>General Tables</h1>
-      <nav>
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-          <li class="breadcrumb-item">Tables</li>
-          <li class="breadcrumb-item active">General</li>
-        </ol>
-      </nav>
-    </div><!-- End Page Title -->
-  
-    <section class="section">
-      <div class="row">
-  
-        <div class="col-lg-12">
-  
-          <div class="card">
-            <div class="card-body">
-              <h5 class="card-title">Order details</h5>
-  
-              <table class="table table-bordered border-primary">
-                <thead>
-                  <tr>
-                    <th scope="col">OrderId</th>
-                    <th scope="col">Username</th>
-                    <th scope="col">Ordered on</th>
-                    <th scope="col">Delivery Address</th>
-                    <th scope="col">Products</th>
-                    <th scope="col">Quantity</th>
-                    <th scope="col">Price</th>
-                    <th scope="col">Total product amount</th>
-                    <th scope="col">Bill amount</th>
-                  </tr>
-                </thead>
-                <tbody>
-                    
+          <div class="pagetitle">
+            <h1>Order details</h1>
+            <nav>
+              <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                <li class="breadcrumb-item">Orders</li>
+                <li class="breadcrumb-item active">Order details</li>
+              </ol>
+            </nav>
+          </div><!-- End Page Title -->
+
+          <section class="section">
+            <div class="row">
+
+              <div class="col-lg-12">
+
+                <div class="card">
+                  <div class="card-body">
+                    <h5 class="card-title">Order details</h5>
+
+                    <table class="table table-bordered border-primary">
+                      <thead>
                         <tr>
-                          <td><%= orderData.orderId %></td>
-
-                          <td><%= orderData.userId.userName %></td>
-
-                          <% const date = orderData.date %>
-                          <td><%= moment(date).format('MMMM Do YYYY, h:mm:ss a') %></td>
-
-                          <td><%= orderData.deliveryAddress %></td>
-
-                          <td><% orderData.product.forEach((product) =>{ %>
-                           <ul>
-                            <li>
-                                <p><%= product.productId.name %></p>
-                            </li>
-                           </ul>
-                          <% }) %>
-                          </td>
-
-                          <td><% orderData.product.forEach((product) =>{ %>
-                            <ul>
-                                <li>
-                                    <p><%= product.quantity %></p>
-                                </li>
-                            </ul>
-                          <% }) %>
-                          </td>
-
-                          <td><% orderData.product.forEach((product) =>{ %>
-                            <ul>
-                                <li>
-                                    <p><%= product.price %></p>
-                                </li>
-                            </ul>
-                          <% }) %>
-                          </td>
-
-                          <td><% orderData.product.forEach((product) =>{ %>
-                            <ul>
-                                <li>
-                                    <p><%= product.productTotalAmount %></p>
-                                </li>
-                            </ul>
-                          <% }) %>
-                          </td>
-                          <td><%= orderData.total %></td>
+                          <th scope="col">OrderId</th>
+                          <th scope="col">Username</th>
+                          <th scope="col">Ordered on</th>
+                          <th scope="col">Delivery Address</th>
+                          <th scope="col">Bill amount</th>
+                          <% if(typeof orderData.discount != "undefined"){ %>
+                            <th scope="col">Discount</th>
+                          <% } %>
                         </tr>
-                 
-                </tbody>
-              </table>
-  
+                      </thead>
+                      <tbody>
+
+                        <tr>
+                          <td>
+                            <%= orderData.orderId %>
+                          </td>
+
+                          <td>
+                            <%= orderData.userId.userName %>
+                          </td>
+
+                          <% const date=orderData.date %>
+                            <td>
+                              <%= moment(date).format('MMMM Do YYYY, h:mm:ss a') %>
+                            </td>
+
+                            <td>
+                              <%= orderData.deliveryAddress %>
+                            </td>
+
+                          <% const total=orderData.total %>
+                            <td>
+                              <%= inFormat.format(total) %>
+                            </td>
+                          <% if(typeof orderData.discount != "undefined") { %>
+                            <td>
+                              <%= inFormat.format(orderData.discount) %>
+                            </td>
+                          <% } %>  
+                        </tr>
+
+                      </tbody>
+                    </table>
+
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-      
-    </section>
-  
-  </main><!-- End #main -->
+
+            <% orderData.product.forEach((product) =>{ %>
+
+              <% const productPrice = product.price%>
+              <% const productTotalAmount = product.productTotalAmount %>
+
+              <div class="row">
+                <div class="col-lg-6 col-md-6 col-sm-6">
+                  <div class="card mb-3" style="max-width: 650px;">
+                    <div class="row g-0">
+                      <div class="col-md-4 col-sm-4">
+                        <img src="/product_images/<%= product.productId.images[0] %>" class="img-fluid rounded-start" alt="...">
+                      </div>
+                      <div class="col-md-8 col-sm-8">
+                        <div class="card-body">
+                          <h5 class="card-title"><%= product.productId.name %></h5>
+                          <p class="card-text"><%= product.productId.description %></p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-6 col-md-6 col-sm-6">
+                  <div class="card text-bg-light mb-3" style="max-width: 18rem;">
+                    <div class="card-body">
+                      <p class="card-text"><small class="text-muted">Quantity</small> : <small class="text-muted"><%= product.quantity %></small></p>
+                      <p class="card-text"><small class="text-muted">Price</small> : <small class="text-muted"><%= inFormat.format(productPrice)%></small></p>
+                      <p class="card-text"><small class="text-muted">Product total</small> : <small class="text-muted"><%= inFormat.format(productTotalAmount)%></small></p>
+                    </div>
+                  </div>
+                  
+                </div>
+              </div>
+            <% }) %>
+
+          </section>
+
+        </main><!-- End #main -->
 
 
 
 
-<%- include('../layout/admin/admin_footer.ejs')  %> 
+        <%- include('../layout/admin/admin_footer.ejs') %>

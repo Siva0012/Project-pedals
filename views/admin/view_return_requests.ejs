@@ -1,0 +1,126 @@
+<%- include('../layout/admin/admin_header.ejs')  %> 
+<%- include('../admin/navbar.ejs')  %> 
+<%- include('../admin/sidebar.ejs')  %> 
+
+<main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>Blank Page</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+          <li class="breadcrumb-item">Pages</li>
+          <li class="breadcrumb-item active">Blank</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section">
+        <div class="row">
+            <div class="col">
+
+              <div class="table-container">
+
+                <table class="table">
+                    <thead>
+                      <tr>
+                        <th scope="col">No</th>
+                        <th scope="col">Image</th>
+                        <th scope="col">Product Name</th>
+                        <th scope="col">Quantity</th>
+                        <th scope="col">Order Id</th>
+                        <th scope="col">Ordered on</th>
+                        <th scope="col">Delivered on</th>
+                        <th scope="col">Product price</th>
+                        <th scope="col">Order Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <div id="orderTableBody">
+
+                        <!--user id to server-->
+                        <input class="d-none" id="userId" type="text" name="userId" , value="<%= orderData.userId %>">
+
+                        <% orderData.product.forEach((data , i) =>{ %>
+                            <tr class="text-start align-middle">
+                              <th scope="row"><%= i + 1  %></th>
+                              <td><img src="/product_images/<%= data.productId.images[0] %>" alt="" height="100em" , width="100em"></td>
+                              <td><%= data.productId.name %> </td>
+                              <td><%= data.quantity %></td>
+                              <td style="max-width: 10em;"><p ><%= orderData.orderId %></p></td>
+                              <td><%= moment(orderData.date).format("MMM Do YYYY") %></td>
+                              <td><%= moment(orderData.deliveredDate).format("MMM Do YYYY") %></td>
+                              <td><%= data.price %></td>
+                              <% if(data.orderStatus === "requestedReturn") { %>
+                                <td>
+                                    <div class="dropdown">
+                                        <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                          <%= data.orderStatus %>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <p class="d-none" id="orderId"><%= orderData._id %></p>
+                                            <li><span class="d-none proId"><%= data.productId._id %></span><a class="dropdown-item" href="/changeReturnStatus/accept"><button class="btn btn-primary statusChangeButton" type="button">Accept return</button></a></li>
+                                            <li><span class="d-none proId"><%= data.productId._id %></span><a class="dropdown-item" href="/changeReturnStatus/decline"><button class="btn btn-primary statusChangeButton" type="button">Decline return</button></a></li>
+                                        </ul>
+                                    </div>
+                                </td>
+                              <% } else{ %>
+                                <td>
+                                  <%= data.orderStatus %>
+                                </td>
+                              <% } %>
+                            </tr>
+
+                            
+                        <% }) %>
+
+                      </div>
+                    </tbody>
+                </table>
+
+              </div>
+
+            </div>
+        </div>
+    </section>
+
+  </main><!-- End #main -->
+
+  <script>
+
+    const button = document.querySelectorAll('.statusChangeButton')
+    button.forEach((button) =>{
+        button.addEventListener('click' , (event) =>{
+            event.preventDefault()
+            const parent = button.parentNode
+            const url = parent.getAttribute('href')
+            const orderId = document.getElementById('orderId').innerHTML
+            const productId = document.querySelector('.proId').innerHTML
+            const userId = $('#userId').attr('value')
+            console.log('this is userId' , userId);
+            $.ajax(
+                {
+                    url : `/admin${url}`,
+                    method : "POST",
+                    data : {
+                        orderId : orderId,
+                        productId : productId,
+                        userId : userId
+                    },
+                    success : (response =>{
+                      console.log(response);
+                      location.reload()
+                      
+
+                    })
+                }
+            )
+            
+        })
+    })
+
+
+  </script>
+
+
+<%- include('../layout/admin/admin_footer.ejs')  %> 

@@ -1,5 +1,6 @@
 <%- include('../layout/user/user_header.ejs') %>
 	
+<% const inFormat = new Intl.NumberFormat('en-IN' , {style : 'currency' , currency : 'INR'}) %>
 	<!-- Header -->
 	<header class="header-v2">
 		<!-- Header desktop -->
@@ -18,16 +19,16 @@
 							<ul class="main-menu">
 	
 								<li>
-									<a href="/">HOME</a>
+									<a href="/" style="text-decoration: none;">HOME</a>
 								</li>
 	
-								<li>
-									<a href="/">BIKES</a>
+								<li >
+									<a href="/" style="text-decoration: none;">BIKES</a>
 									
-									<ul class="sub-menu">
+									<ul class="sub-menu " >
 										<% catData.forEach(catData =>{ %>
 											<%= console.log(catData); %>
-										<li><a href="/viewAllProducts/<%= catData._id %>" > <%= catData.name %></a></li>
+										<li><a href="/viewAllProducts/<%= catData._id %>" style="text-decoration: none;"> <%= catData.name %></a></li>
 										<% }) %>
 									</ul>
 									
@@ -44,14 +45,9 @@
 					<!-- Icon header -->
 					<div class="wrap-icon-header flex-w flex-r-m h-full">
 
-						<div class="flex-c-m h-full p-r-24">
-							<div class="icon-header-item cl2 hov-cl1 trans-04 p-lr-11">
-								<i class="zmdi zmdi-search"></i>
-							</div>
-						</div>
 							
 						<div class="flex-c-m h-full p-l-18 p-r-25 bor5">
-							<div class="icon-header-item cl2 hov-cl1 trans-04 p-lr-11 icon-header-noti js-show-cart" data-notify="2">
+							<div class="icon-header-item cl2 hov-cl1 trans-04 p-lr-11 js-show-cart" data-notify="2">
 								<i class="zmdi zmdi-shopping-cart"></i>
 							</div>
 						</div>
@@ -71,22 +67,12 @@
 		<div class="wrap-header-mobile">
 			<!-- Logo moblie -->		
 			<div class="logo-mobile">
-				<a href="index.html"><img src="/images/pedals-black.png" alt="IMG-LOGO"></a>
+				<a href="/"><img src="/images/pedals-black.png" alt="IMG-LOGO"></a>
 			</div>
 
 			<!-- Icon header -->
 			<div class="wrap-icon-header flex-w flex-r-m h-full m-r-15">
-				<div class="flex-c-m h-full p-r-10">
-					<div class="icon-header-item cl2 hov-cl1 trans-04 p-lr-11 js-show-modal-search">
-						<i class="zmdi zmdi-search"></i>
-					</div>
-				</div>
-
-				<div class="flex-c-m h-full p-lr-10 bor5">
-					<div class="icon-header-item cl2 hov-cl1 trans-04 p-lr-11 icon-header-noti js-show-cart" data-notify="2">
-						<i class="zmdi zmdi-search"></i>
-					</div>
-				</div>
+				
 				<div class="flex-c-m h-full p-lr-10 bor5">
 					<div class="icon-header-item cl2 hov-cl1 trans-04 p-lr-11 icon-header-noti js-show-cart" data-notify="2">
 						<i class="zmdi zmdi-shopping-cart"></i>
@@ -106,27 +92,64 @@
 		<!-- Menu Mobile -->
 		<div class="menu-mobile">
 			<ul class="main-menu-m">
-				<a href="/">HOME</a>
-			</ul>
-			
-			<ul class="main-menu-m">
+
 				<li>
-					<a href="">BIKES</a>
-					<ul class="sub-menu-m">
-						<li><a href="/mountainbikes">Mountain bikes</a></li>
-						<li><a href="home-02.html">Hybrid bikes</a></li>
-						<li><a href="home-03.html">Kids bikes</a></li>
+					<a href="/" style="text-decoration: none;">BIKES</a>
+					
+					<ul class="sub-menu-m" >
+						<% catData.forEach(catData =>{ %>
+							<%= console.log(catData); %>
+						<li><a href="/viewAllProducts/<%= catData._id %>" style="text-decoration: none;"> <%= catData.name %></a></li>
+						<% }) %>
 					</ul>
+					
 					<span class="arrow-main-menu-m">
 						<i class="fa fa-angle-right" aria-hidden="true"></i>
 					</span>
 				</li>
+				<li>
+					<a href="/viewWishlist">My wishlist</a>
+				</li>
+
+				<li>
+					<a href="/viewOrders">My orders</a>
+				</li>
+
+				<% if (typeof userName !== 'undefined') { %>
+					<ul class="mx-0 my-0 main-menu text-dark">
+					
+						<li class="mx-0 my-0 active-menu text-dark">
+							<a href="/userProfile" class="stext-102 cl2 hov-cl1 trans-04 text-dark">
+								<%= userName %>
+							</a>
+							<ul class="sub-menu my-0">
+								<li><a href="/userLogout" class="text-dark">Logout</a></li>
+								
+							</ul>
+							
+						</li>
+
+					</ul>
+				<% } else{%>
+					<ul class="mx-0 my-0 main-menu text-dark">
+					
+						<li class="mx-0 my-0 active-menu text-dark">
+							<a href="/userLogin" class="stext-102 cl2 hov-cl1 trans-04 text-dark">
+								Account
+							</a>
+							<ul class="sub-menu my-0">
+								<li><a href="/userLogout" class="text-dark">Logout</a></li>
+							</ul>
+							
+						</li>
+
+					</ul>
+				<% }%>
+				
 
 			</ul>
-			
 		</div>
-
-		
+	
 	</header>
 
 	<!-- Sidebar -->
@@ -148,9 +171,15 @@
 						</a>
 					</li>
 
-					<li class="">
+					<li class="my-2">
 						<a href="/viewWishlist" class="stext-102 cl2 hov-cl1 trans-04">
 							My Wishlist
+						</a>
+					</li>
+
+					<li class="">
+						<a href="/viewOrders" class="stext-102 cl2 hov-cl1 trans-04">
+							My Orders
 						</a>
 					</li>
 
@@ -223,9 +252,9 @@
 									<a href="#" class="header-cart-item-name m-b-18 hov-cl1 trans-04">
 										<%= element.productId.name %>
 									</a>
-			
+									<% const price = element.productId.price %>
 									<span class="header-cart-item-info">
-										<%= element.productId.price %> X <%= element.quantity%>
+										<%= inFormat.format(price) %> X <%= element.quantity%>
 									</span>
 								</div>
 							</li>
@@ -236,8 +265,9 @@
 				<div class="w-full">
 
 					<% if(typeof cartData !== 'undefined') { %>
+						<% const total = cartData.totalCartAmount %>
 						<div class="header-cart-total w-full p-tb-40">
-							Cart total : Rs.<%= cartData.totalCartAmount %>
+							Cart total : <%= inFormat.format(total) %>
 						</div>
 					<% } %>
 					
@@ -330,30 +360,21 @@
 		<div class="container">
 			<div class="row">
 				<div class="col-sm-6 col-lg-3 p-b-30">
+
 					<h4 class="stext-301 cl0 p-b-30">
 						Categories
 					</h4>
 
 					<ul>
-						<li class="p-b-10">
-							<a href="user/mountain/bikes" class="stext-107 cl7 hov-cl1 trans-04">
-								Mountain bikes
-							</a>
-						</li>
-
-						<li class="p-b-10">
-							<a href="#" class="stext-107 cl7 hov-cl1 trans-04">
-								Hybrid bikes
-							</a>
-						</li>
-
-						<li class="p-b-10">
-							<a href="#" class="stext-107 cl7 hov-cl1 trans-04">
-								Kids bikes
-							</a>
-						</li>
-
+						<% catData.forEach((data) =>{ %>
+							<li class="p-b-10">
+								<a href="/viewAllProducts/<%=data._id %>" class="stext-107 cl7 hov-cl1 trans-04">
+									<%=data.name %>
+								</a>
+							</li>
+						<% }) %>
 					</ul>
+
 				</div>
 
 				<div class="col-sm-6 col-lg-3 p-b-30">
@@ -615,6 +636,12 @@ Copyright &copy;<script>document.write(new Date().getFullYear());</script> All r
 			</div>
 		</div>
 	</div>
+
+	<style>
+		a{
+			text-decoration: none;
+		}
+	</style>
 
 <%- include('../layout/user/user_footer.ejs') %>
 

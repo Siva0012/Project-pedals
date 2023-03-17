@@ -2,6 +2,8 @@
 <%- include('../admin/navbar.ejs')  %> 
 <%- include('../admin/sidebar.ejs')  %> 
 
+<% const inFormat = new Intl.NumberFormat('en-IN' , {style : 'currency' , currency : 'INR'}) %>
+
   
 
 <main id="main" class="main">
@@ -10,8 +12,8 @@
     <h1>Products</h1>
     <nav>
       <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="index.html">Admin</a></li>
-        <li class="breadcrumb-item active">view products</li>
+        <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+        <li class="breadcrumb-item active">Products</li>
       </ol>
     </nav>
     <div class="add_new_product">
@@ -48,7 +50,8 @@
                       <th scope="row"><%= index + 1 %></th>
                       <td><%- productData.name %></td>
                       <td><%- productData.categoryName %></td>
-                      <td><%- productData.price %></td>
+                      <% const productPrice = productData.price %>
+                      <td><%= inFormat.format(productPrice) %></td>
                       <td><%- productData.stock %></td>
                       <td><img src="/product_images/<%= productData.images[0] %>" height="100em" width="100em" alt="<%- productData.images[0] %>"></td>
                       <td><%- productData.description %></td>
