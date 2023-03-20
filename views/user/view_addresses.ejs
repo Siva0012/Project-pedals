@@ -37,7 +37,7 @@
                       </div>
                       <div class="mb-3">
                         <label for="recipient-name" class="col-form-label">Mobile number</label>
-                        <input type="text" class="form-control" id="recipient-name" name="phone">
+                        <input type="text" class="form-control" id="inPhone" name="phone">
                       </div>
                       <div class="mb-3">
                         <label for="message-text" class="col-form-label">Addressline</label>
@@ -53,11 +53,11 @@
                       </div>
                       <div class="mb-3">
                         <label for="recipient-name" class="col-form-label">Pincode</label>
-                        <input type="text" class="form-control" id="recipient-name" name="pincode">
+                        <input type="text" class="form-control" id="inPin" name="pincode">
                       </div>
                       <div class="mb-3">
                         <label for="recipient-name" class="col-form-label">Alternate phone</label>
-                        <input type="text" class="form-control" id="recipient-name" name="alternatePhone">
+                        <input type="text" class="form-control" id="inAlt" name="alternatePhone">
                       </div>
 
                       <div class="text-align-end">
@@ -114,7 +114,7 @@
                     </div>
                   </div>
     
-                  <!--Modal-->
+                  <!--Modal for editin address-->
                   <div class="modal fade" id="<%= addresses._id%>" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                     <div class="modal-dialog">
                       <div class="modal-content">
@@ -201,30 +201,58 @@
       console.log('checked nullfields ');
       /*------Empty fields checking------*/
       if (!nullFields) {
-        console.log('entering  to false case');
-        const url = '/insertAddress'
-        const formData = new FormData(form)
-        fetch(url,
-          {
-            method: 'post',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(Object.fromEntries(formData))
-          }
-        )
-          .then(async (response) => {
-            const message = await response.json()
-            Swal.fire({
-              position: 'bottom-end',
-              icon: 'success',
-              title: "Address added",
-              showConfirmButton: false,
-              timer: 2000
-            })
 
-            $('#reloadDiv').load('/viewAddresses #reloadDiv')
-            console.log('reloaded');
-            $('#insertModal').modal('hide')
-          })
+        const phone = document.getElementById('inPhone').value
+        const pin = document.getElementById('inPin').value
+        const alt = document.getElementById('inAlt').value
+
+        console.log(phone.length);
+        console.log(pin.length);
+        console.log(alt.length);
+
+        if(phone.length < 10){
+          $('#alertDiv').show().html("Enter a valid phone number!!")
+          setTimeout(() => {
+            $('#alertDiv').fadeOut('slow')
+          }, 1500)
+        }else if(pin.length < 6){
+          $('#alertDiv').show().html("Enter a valid pin number!!")
+          setTimeout(() => {
+            $('#alertDiv').fadeOut('slow')
+          }, 1500)
+        }else if(alt.length < 10){
+          $('#alertDiv').show().html("Enter a valid alternate phone number!!")
+          setTimeout(() => {
+            $('#alertDiv').fadeOut('slow')
+          }, 1500)
+        }else{
+
+          console.log('entering  to false case');
+          const url = '/insertAddress'
+          const formData = new FormData(form)
+          fetch(url,
+            {
+              method: 'post',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(Object.fromEntries(formData))
+            }
+          )
+            .then(async (response) => {
+              const message = await response.json()
+              Swal.fire({
+                position: 'bottom-end',
+                icon: 'success',
+                title: "Address added",
+                showConfirmButton: false,
+                timer: 2000
+              })
+  
+              $('#reloadDiv').load('/viewAddresses #reloadDiv')
+              console.log('reloaded');
+              $('#insertModal').modal('hide')
+            })
+        }
+
 
       }
     })

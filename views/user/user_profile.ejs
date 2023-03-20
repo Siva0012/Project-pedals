@@ -72,7 +72,7 @@
                   </div>
                   <div class="mb-3">
                     <label for="exampleInputPassword2" class="form-label">Re-enter new password</label>
-                    <input type="password" class="form-control" id="rePass" >
+                    <input type="password" class="form-control" id="rePass" name="confirmPassword" >
                   </div>
                   <!-- <button type="submit" class="btn btn-primary">Submit</button> -->
                   <div class="modal-footer">
@@ -201,13 +201,10 @@
 
     $(document).ready(() =>{
       const inputs = document.querySelectorAll('form input')
-      console.log('this is inputs' , inputs);
-      
     })
 
     function changeVisibiliy () {
       const input = document.getElementById('currentPasswordId')
-      console.log('this is input in change' , input);
       const checkboxButton = document.getElementById('showCheckbox')
       if(checkboxButton.checked){
         input.type = 'text'
@@ -230,40 +227,54 @@
           } , 2000)
         }
       }
+
+      let newPass =document.getElementById('newPass').value
+      let rePass = document.getElementById('rePass').value
+      
       if(!nullField){
-        console.log(`form submitted`)
-        const formData = new FormData(form)
-        const url = '/changePassword'
-        fetch(url ,
-          {
-            method : 'POST',
-            headers : {'Content-Type' : 'application/json'},
-            body : JSON.stringify(Object.fromEntries(formData)),
-          }
-        )
-        .then(async (response) =>{
-          const data = await response.json()
-          if(data.message){
-            
-            Swal.fire({
-              position: 'bottom-end',
-              icon: 'success',
-              title: data.message,
-              showConfirmButton: false,
-              timer: 2000
-            })
+        if(newPass == rePass){
+          const formData = new FormData(form)
+          const url = '/changePassword'
+          fetch(url ,
+            {
+              method : 'POST',
+              headers : {'Content-Type' : 'application/json'},
+              body : JSON.stringify(Object.fromEntries(formData)),
+            }
+          )
+          .then(async (response) =>{
+            const data = await response.json()
+            if(data.message){
+              
+              Swal.fire({
+                position: 'bottom-end',
+                icon: 'success',
+                title: data.message,
+                showConfirmButton: false,
+                timer: 2000
+              })
+              form.reset()
+              $('#exampleModal').modal('hide')
+            }else{
+              $('#errorAlert').attr({style : 'display : block'}).html(data.error)
+              setTimeout(() =>{
+                $('#errorAlert').hide()
+                form.reset()
+              } , 1500)
+            }
+          })
+          .catch((error) =>{
+            console.log(error);
+          })
+
+        }else{
+          $('#errorAlert').attr({style : 'display : block ; color : red'}).html("Entered passwords are not matching!!")
+          setTimeout(() =>{
+            $('#errorAlert').hide()
             form.reset()
-            $('#exampleModal').modal('hide')
-          }else{
-            $('#errorAlert').attr({style : 'display : block'}).html(data.error)
-            setTimeout(() =>{
-              $('#errorAlert').hide()
-            } , 1500)
-          }
-        })
-        .catch((error) =>{
-          console.log(error);
-        })
+          } , 2000)
+        }
+
       }
     })
 
