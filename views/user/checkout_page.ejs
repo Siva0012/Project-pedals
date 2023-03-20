@@ -17,289 +17,323 @@
             </div>
           </div>
 
-          <div class="row">
+          <% const value = userData.addresses.length %>
+          <% if(value < 1){ %>
+            <div class="row" id="addressTitle">
+              <div class="col-lg-8">
+                <h1>Please add delivery address before checkout </h1>
+                <p><a href="/userProfile">Go to profile</a></p>
+              </div>
+            </div>
+          <% }else{ %>
 
-            <div class="col-lg-8">
-              <% userData.addresses.forEach((addresses , i)=>{ %>
-                <div class="form-check">
-                  <input class="form-check-input" type="radio" name="address"
-                    value="<%= addresses.name %> , <%= addresses.phone %> , <%= addresses.addressline %> , <%= addresses.city %> , <%= addresses.state %> , <%= addresses.pincode %> , <%= addresses.alternatePhone %>"
-                    <%= i===0 ? 'checked' : '' %> id="flexRadioDefault1">
-                  <label class="form-check-label col" for="flexRadioDefault1">
-                    <div class="col">
-                      <div class="card mb-4">
-                        <div class="card-body">
-                          <div class="row">
-                            <div class="col-sm-3">
-                              <div class="details d-flex flex-column justify-content-between">
-                                <p class="mb-0">
-                                  <%= addresses.name %>
-                                </p>
-                                <p class="mb-0">
-                                  <%= addresses.phone %>
-                                </p>
+            <div class="row">
+            
+                <div class="col-lg-8">
+                  <div class="title mb-2">
+                    <h5 class="fw-semibold text-muted ms-1 mb-1"><i class="fa-solid fa-map-location-dot"></i><span class="ms-3">Choose where to deliver</span> </h5>
+                  </div>
+                  <div class="card mb-3">
+                    <div class="card-body">
+
+                      <% userData.addresses.forEach((addresses , i)=>{ %>
+                        <div class="form-check">
+                          <input class="form-check-input" type="radio" name="address"
+                            value="<%= addresses.name %> , <%= addresses.phone %> , <%= addresses.addressline %> , <%= addresses.city %> , <%= addresses.state %> , <%= addresses.pincode %> , <%= addresses.alternatePhone %>"
+                            <%= i===0 ? 'checked' : '' %> id="flexRadioDefault1">
+                          <label class="form-check-label col" for="flexRadioDefault1">
+                            <div class="col">
+                              <div class="card shadow-sm mb-4">
+                                <div class="card-body">
+                                  <div class="row">
+                                    <div class="col-sm-3">
+                                      <div class="details d-flex flex-column justify-content-between">
+                                        <p class="mb-0">
+                                          <%= addresses.name %>
+                                        </p>
+                                        <p class="mb-0">
+                                          <%= addresses.phone %>
+                                        </p>
+                                      </div>
+                                    </div>
+                                    <div class="col-sm-9">
+                                      <div class="add-wrapper d-flex justify-content-between">
+                                        <div class="address">
+                                          <p class="text-muted mb-0">
+                                            <%= addresses.addressline %>
+                                          </p>
+                                          <p class="text-muted mb-0"><span>
+                                              <%= addresses.city %> &nbsp;
+                                            </span>
+                                            <%= addresses.state %><span> &nbsp; <span>
+                                                  <%= addresses.pincode %>
+                                                </span>
+                                          </p>
+                                        </div>
+                                        <div class="editAddress">
+                                          <button class="text-primary" type="button" data-bs-toggle="modal"
+                                            data-bs-target="#<%= addresses._id %>" data-bs-whatever="@mdo">Edit</button>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
                               </div>
                             </div>
-                            <div class="col-sm-9">
-                              <div class="add-wrapper d-flex justify-content-between">
-                                <div class="address">
-                                  <p class="text-muted mb-0">
-                                    <%= addresses.addressline %>
-                                  </p>
-                                  <p class="text-muted mb-0"><span>
-                                      <%= addresses.city %> &nbsp;
-                                    </span>
-                                    <%= addresses.state %><span> &nbsp; <span>
-                                          <%= addresses.pincode %>
-                                        </span>
-                                  </p>
-                                </div>
-                                <div class="editAddress">
-                                  <button class="text-primary" type="button" data-bs-toggle="modal"
-                                    data-bs-target="#<%= addresses._id %>" data-bs-whatever="@mdo">Edit</button>
-                                </div>
+                          </label>
+                        </div>
+        
+                        <!--Modal-->
+                        <div class="modal fade" id="<%= addresses._id%>" tabindex="-1" aria-labelledby="exampleModalLabel"
+                          aria-hidden="true">
+                          <div class="modal-dialog">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h1 class="modal-title fs-5" id="exampleModalLabel">Edit address</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                               </div>
+                              <div class="modal-body">
+                                <form method="post" action="/editAddress">
+        
+                                  <div class="mb-3">
+                                    <label for="recipient-name" class="col-form-label">Name</label>
+                                    <input type="text" class="form-control" id="recipient-name" name="name"
+                                      value="<%=addresses.name %>">
+                                  </div>
+                                  <div class="mb-3">
+                                    <label for="recipient-name" class="col-form-label">Mobile number</label>
+                                    <input type="text" class="form-control" id="recipient-name" name="phone"
+                                      value="<%=addresses.phone %>">
+                                  </div>
+                                  <div class="mb-3">
+                                    <label for="message-text" class="col-form-label">Addressline</label>
+                                    <textarea class="form-control" id="message-text"
+                                      name="addressline"><%= addresses.addressline %></textarea>
+                                  </div>
+                                  <div class="mb-3">
+                                    <label for="recipient-name" class="col-form-label">City</label>
+                                    <input type="text" class="form-control" id="recipient-name" name="city"
+                                      value="<%=addresses.city %>">
+                                  </div>
+                                  <div class="mb-3">
+                                    <label for="recipient-name" class="col-form-label">State</label>
+                                    <input type="text" class="form-control" id="recipient-name" name="state"
+                                      value="<%=addresses.state %>">
+                                  </div>
+                                  <div class="mb-3">
+                                    <label for="recipient-name" class="col-form-label">Pincode</label>
+                                    <input type="text" class="form-control" id="recipient-name" name="pincode"
+                                      value="<%=addresses.pincode %>">
+                                  </div>
+                                  <div class="mb-3">
+                                    <label for="recipient-name" class="col-form-label">Alternate phone</label>
+                                    <input type="text" class="form-control" id="recipient-name" name="alternatePhone"
+                                      value="<%=addresses.alternatePhone %>">
+                                  </div>
+                                  <div class="mb-3 d-none">
+                                    <label for="recipient-name" class="col-form-label">Alternate phone</label>
+                                    <input type="text" class="form-control" id="recipient-name" name="addressId"
+                                      value="<%=addresses._id %>">
+                                  </div>
+        
+                                  <div class="text-align-end">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary">Edit address</button>
+                                  </div>
+        
+                                </form>
+                              </div>
+        
                             </div>
                           </div>
                         </div>
+        
+                        <% }) %>
+                    </div>
+                  </div>
+    
+                      <div class="row">
+                        <div class="col-lg-12">
+                          <div class="title mb-2">
+                            <h5 class="text-muted fw-semibold ms-1"><i class="fa-solid fa-boxes-stacked"></i><span class="ms-3">Products</span></h5>
+                          </div>
+                          <div class="card mb-4">
+                            <% proData.cart.forEach((proData)=>{ %>
+                              <div class="card-body">
+                                <div class="row">
+                                  <div class="col-sm-3">
+                                    <div class="details d-flex flex-column justify-content-between">
+                                      <div class="how-itemcart1">
+                                        <img src="/product_images/<%= proData.productId.images[0] %>" alt="IMG">
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div class="col-sm-3 my-auto">
+                                    <div class="add-wrapper d-flex justify-content-between flex-column">
+                                      <div class="address">
+                                        <p class="text-muted mb-0">
+                                          <%= proData.productId.name %>
+                                        </p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div class="col-sm-3 my-auto">
+                                    <div class="add-wrapper d-flex justify-content-between">
+                                      <div class="address">
+                                        <p class="text-muted mb-0">
+                                          <%= proData.quantity %>
+                                        </p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div class="col-sm-3 my-auto">
+                                    <div class="add-wrapper d-flex justify-content-between">
+                                      <div class="address">
+                                        <p class="text-muted mb-0">
+                                          <% const price = proData.productId.price %>
+                                          <%= inFormat.format(price) %>
+                                        </p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+    
+                              <!--product details to server--------->
+                              <div class="prodetails d-none">
+                                <input type="text" name="productId" value="<%= proData.productId._id %>">
+                                <input type="text" name="productPrice" value="<%= proData.productId.price %>">
+                                <input type="text" name="productTotalAmount" value="<%= proData.totalProductAmount %>">
+                                <input type="text" name="productQuantity" value="<%= proData.quantity %>">
+                                <input type="text" name="totalCartAmount" id="total-pay-to-server" value="<%= userData.totalCartAmount %>">
+                                
+                              </div>
+    
+                              <% }) %>
+                              <div class="d-none">
+                                <input type="text" name="discountAmount" id="disc-to-server" value="">
+                                <input type="text" name="couponData" id="couponData" value="">
+                              </div>
+    
+                          </div>
+                        </div>
+    
+                      </div>
+    
+                </div>
+              
+  
+  
+              <div class="col-lg-4">
+                <div class="title mb-2">
+                  <h5 class="text-muted fw-semibold ms-1"><i class="fa-solid fa-money-check-dollar"></i><span class="ms-3">Price details</span></h5>
+                </div>
+                <div class="card mb-4 py-2">
+                  <div class="card-body">
+                    <div class="row">
+                      <div class="px-0 d-flex justify-content-between">
+                        <div class="col-sm-7 col-md-7">
+                          <p class="text-muted mb-1">Cart amount</p>
+                        </div>
+                        <div class="col-sm-5 col-md-5">
+                          <% const cartAmount = userData.totalCartAmount %>
+                          <p class="text-muted mb-0"><%= inFormat.format(cartAmount) %>
+                          </p>
+                        </div>
                       </div>
                     </div>
-                  </label>
-                </div>
-
-                <!--Modal-->
-                <div class="modal fade" id="<%= addresses._id%>" tabindex="-1" aria-labelledby="exampleModalLabel"
-                  aria-hidden="true">
-                  <div class="modal-dialog">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <h1 class="modal-title fs-5" id="exampleModalLabel">Edit address</h1>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    
+                    <div class="row">
+                      <div class="px-0 d-flex justify-content-between">
+                        <div class="col-sm-7 col-md-7">
+                          <p class="text-muted mb-1 disc">Discount</p>
+                        </div>
+                        <div class="col-sm-5 col-md-5">
+                          <p class="text-muted mb-0 disc" id="discount"><%= inFormat.format(0) %></p>
+                        </div>
                       </div>
-                      <div class="modal-body">
-                        <form method="post" action="/editAddress">
-
-                          <div class="mb-3">
-                            <label for="recipient-name" class="col-form-label">Name</label>
-                            <input type="text" class="form-control" id="recipient-name" name="name"
-                              value="<%=addresses.name %>">
-                          </div>
-                          <div class="mb-3">
-                            <label for="recipient-name" class="col-form-label">Mobile number</label>
-                            <input type="text" class="form-control" id="recipient-name" name="phone"
-                              value="<%=addresses.phone %>">
-                          </div>
-                          <div class="mb-3">
-                            <label for="message-text" class="col-form-label">Addressline</label>
-                            <textarea class="form-control" id="message-text"
-                              name="addressline"><%= addresses.addressline %></textarea>
-                          </div>
-                          <div class="mb-3">
-                            <label for="recipient-name" class="col-form-label">City</label>
-                            <input type="text" class="form-control" id="recipient-name" name="city"
-                              value="<%=addresses.city %>">
-                          </div>
-                          <div class="mb-3">
-                            <label for="recipient-name" class="col-form-label">State</label>
-                            <input type="text" class="form-control" id="recipient-name" name="state"
-                              value="<%=addresses.state %>">
-                          </div>
-                          <div class="mb-3">
-                            <label for="recipient-name" class="col-form-label">Pincode</label>
-                            <input type="text" class="form-control" id="recipient-name" name="pincode"
-                              value="<%=addresses.pincode %>">
-                          </div>
-                          <div class="mb-3">
-                            <label for="recipient-name" class="col-form-label">Alternate phone</label>
-                            <input type="text" class="form-control" id="recipient-name" name="alternatePhone"
-                              value="<%=addresses.alternatePhone %>">
-                          </div>
-                          <div class="mb-3 d-none">
-                            <label for="recipient-name" class="col-form-label">Alternate phone</label>
-                            <input type="text" class="form-control" id="recipient-name" name="addressId"
-                              value="<%=addresses._id %>">
-                          </div>
-
-                          <div class="text-align-end">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-primary">Edit address</button>
-                          </div>
-
+                    </div>
+  
+                    <div class="row my-3">
+                      <div class="formDiv">
+                        <form action="/redeemCoupon" method="POST" id="couponForm">
+                            <div class="mb-3">
+                                <label for="exampleInputEmail1" class="form-label">Redeem coupon</label>
+                                <input type="text" class="form-control" id="exampleInputEmail1"
+                                    aria-describedby="emailHelp" name="couponCode" >
+                            </div>
+                            <button type="submit" id="formButton"
+                                class="btn btn-primary">Redeem</button>
                         </form>
                       </div>
-
                     </div>
-                  </div>
-                </div>
-
-                <% }) %>
-
-                  <div class="row">
-                    <div class="col-lg-12">
-                      <div class="card mb-4">
-                        <% proData.cart.forEach((proData)=>{ %>
-                          <div class="card-body">
-                            <div class="row">
-                              <div class="col-sm-3">
-                                <div class="details d-flex flex-column justify-content-between">
-                                  <div class="how-itemcart1">
-                                    <img src="/product_images/<%= proData.productId.images[0] %>" alt="IMG">
-                                  </div>
-                                </div>
-                              </div>
-                              <div class="col-sm-3 my-auto">
-                                <div class="add-wrapper d-flex justify-content-between flex-column">
-                                  <div class="address">
-                                    <p class="text-muted mb-0">
-                                      <%= proData.productId.name %>
-                                    </p>
-                                  </div>
-                                </div>
-                              </div>
-                              <div class="col-sm-3 my-auto">
-                                <div class="add-wrapper d-flex justify-content-between">
-                                  <div class="address">
-                                    <p class="text-muted mb-0">
-                                      <%= proData.quantity %>
-                                    </p>
-                                  </div>
-                                </div>
-                              </div>
-                              <div class="col-sm-3 my-auto">
-                                <div class="add-wrapper d-flex justify-content-between">
-                                  <div class="address">
-                                    <p class="text-muted mb-0">
-                                      <% const price = proData.productId.price %>
-                                      <%= inFormat.format(price) %>
-                                    </p>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-
-                          <!--product details to server--------->
-                          <div class="prodetails d-none">
-                            <input type="text" name="productId" value="<%= proData.productId._id %>">
-                            <input type="text" name="productPrice" value="<%= proData.productId.price %>">
-                            <input type="text" name="productTotalAmount" value="<%= proData.totalProductAmount %>">
-                            <input type="text" name="productQuantity" value="<%= proData.quantity %>">
-                            <input type="text" name="totalCartAmount" id="total-pay-to-server" value="<%= userData.totalCartAmount %>">
-                            
-                          </div>
-
-                          <% }) %>
-                          <div class="d-none">
-                            <input type="text" name="discountAmount" id="disc-to-server" value="">
-                            <input type="text" name="couponData" id="couponData" value="">
-                          </div>
-
+  
+                    <div class="row mt-4 ">
+                      <div class="col-sm-7">
+                        <p class="text-muted mb-1">Total payable</p>
+                      </div>
+                      <div class="col-sm-5">
+                        <p class="text-muted mb-0" id="totalPayable">
+                          <% const payable = userData.totalCartAmount %>
+                          <%= inFormat.format(payable) %>
+                        </p>
                       </div>
                     </div>
-
                   </div>
-
-            </div>
-
-            <div class="col-lg-4">
-              <div class="card mb-4">
-                <div class="card-body">
-
-                  <h5 class="my-3">Price details</h5>
-
+  
+                  <!--alert div-->
                   <div class="row">
-                    <div class="col-sm-7">
-                      <p class="text-muted mb-1">Cart amount</p>
-                    </div>
-                    <div class="col-sm-5">
-                      <% const cartAmount = userData.totalCartAmount %>
-                      <p class="text-muted mb-0"><%= inFormat.format(cartAmount) %>
-                      </p>
+                    <div class="col">
+                      <div class="alert alert-warning mt-2" role="alert"  id="alertDiv" style="display : none">
+                        
+                      </div>
                     </div>
                   </div>
-                  
-                  <div class="row ">
-                    <div class="col-sm-7">
-                      <p class="text-muted mb-1 disc">Discount</p>
-                    </div>
-                    <div class="col-sm-5">
-                      <p class="text-muted mb-0 disc" id="discount"><%= inFormat.format(0) %></p>
-                    </div>
-                  </div>
-
-                  <div class="row my-3">
-                    <div class="formDiv">
-                      <form action="/redeemCoupon" method="POST" id="couponForm">
-                          <div class="mb-3">
-                              <label for="exampleInputEmail1" class="form-label">Redeem coupon</label>
-                              <input type="text" class="form-control" id="exampleInputEmail1"
-                                  aria-describedby="emailHelp" name="couponCode" >
-                          </div>
-                          <button type="submit" id="formButton"
-                              class="btn btn-primary">Redeem</button>
-                      </form>
-                    </div>
-                  </div>
-
-                  <div class="row mt-4 ">
-                    <div class="col-sm-7">
-                      <p class="text-muted mb-1">Total payable</p>
-                    </div>
-                    <div class="col-sm-5">
-                      <p class="text-muted mb-0" id="totalPayable">
-                        <% const payable = userData.totalCartAmount %>
-                        <%= inFormat.format(payable) %>
-                      </p>
-                    </div>
-                  </div>
+  
                 </div>
 
-                <!--alert div-->
-                <div class="row">
-                  <div class="col">
-                    <div class="alert alert-warning mt-2" role="alert"  id="alertDiv" style="display : none">
+                <div class="title mb-2">
+                  <h5 class="text-muted fw-semibold ms-1"><i class="fa-solid fa-credit-card"></i><span class="ms-3">Payment options</span></h5>
+                </div>
+  
+                <div class="card mb-4">
+                  <div class="card-body">
+                    <h5 class="my-2">Select payment method</h5>
+                    <div class="form-check mb-3">
+                      <input class="form-check-input" type="radio" checked name="paymentMethod" id="codRadio" value="cod">
+                      <label class="form-check-label" for="codRadio" >
+                          COD
+                      </label>
+                    </div>
+                    <div class="form-check mb-3">
+                      <input class="form-check-input" type="radio" name="paymentMethod" id="onlineRadio" value="online">
+                      <label class="form-check-label" for="onlineRadio" >
+                          Online payment
+                      </label>
+                    </div>
+                    <div class="form-check mb-3">
+                      <p id="wallet-para" class="text-success">Wallet amount : <span id="wallet-amount"><%= userData.walletAmount %></span></p>
+                    </div>
+                    <div class="form-check mb-3">
+                      <input class="form-check-input" type="radio" name="paymentMethod" id="walletRadio" value="wallet">
+                      <label class="form-check-label" for="onlineRadio" >
+                          Wallet
+                      </label>
                       
                     </div>
                   </div>
                 </div>
-
-              </div>
-
-              <div class="card mb-4">
-                <div class="card-body">
-                  <h5 class="my-2">Select payment method</h5>
-                  <div class="form-check mb-3">
-                    <input class="form-check-input" type="radio" checked name="paymentMethod" id="codRadio" value="cod">
-                    <label class="form-check-label" for="codRadio" >
-                        COD
-                    </label>
-                  </div>
-                  <div class="form-check mb-3">
-                    <input class="form-check-input" type="radio" name="paymentMethod" id="onlineRadio" value="online">
-                    <label class="form-check-label" for="onlineRadio" >
-                        Online payment
-                    </label>
-                  </div>
-                  <div class="form-check mb-3">
-                    <p id="wallet-para" class="text-success">Wallet amount : <span id="wallet-amount"><%= userData.walletAmount %></span></p>
-                  </div>
-                  <div class="form-check mb-3">
-                    <input class="form-check-input" type="radio" name="paymentMethod" id="walletRadio" value="wallet">
-                    <label class="form-check-label" for="onlineRadio" >
-                        Wallet
-                    </label>
-                    
-                  </div>
+  
+                <div class="placeOrder d-grid">
+                  <button class="btn btn-success" id="orderButton" type="submit">Place order</button>
                 </div>
+                
               </div>
-
-              
+  
             </div>
 
-          </div>
-          <div class="placeOrder">
-            <button class="btn btn-primary " type="submit">Place order</button>
-          </div>
+          <% } %>
+
         </div>
         
       </form>
@@ -416,15 +450,10 @@
             
           })
           rzp1.open();
-          console.log('debuggin hereeeeee');
-          
-
         }
         
         /*------verifying payment by sending order and payment back to server------*/
         let verifyPayment = (payment, order , orderId) => {
-
-          console.log('verifypayment calledddddd');
 
           $.ajax({
             url: '/verifyPayment',
@@ -442,10 +471,9 @@
                 
                 setTimeout(() =>{
                   location.href = url /*------redirecting to confirm page-----*/
-                } , 1000)
+                } , 500)
 
               }else{
-                console.log('else case workingggg');
                 alert('payment failed')
               }
             }
@@ -468,7 +496,6 @@
                 if (input.value == "") {
                     displayError('Please enter a coupon code!!')
                 } else {
-                    console.log("called fetch method");
                     const url = "/redeemCoupon";
                     const formData = new FormData(form);
                     try {
@@ -490,12 +517,6 @@
                             displayError(data.couponExpired);
                         } else {
                             displayError(data.message);
-                            // $('#cartTotal').html(data.oldCartAmountt)
-                            // $('#cartTotal').load('/viewCart #cartTotal')
-                            console.log('this is old cart amount ' , data.oldCartAmount);
-                            console.log('this is new cart amount ' , data.newTotalCartAmount);
-                            console.log('this is discount amount' , data.discountAmount);
-
                             const newTotalCartAmount = inFormat.format(data.newTotalCartAmount) 
                             const oldCartAmount = inFormat.format(data.oldCartAmount)
                             const discountAmount = inFormat.format(data.discountAmount)
@@ -506,11 +527,9 @@
                             $('#coupon-applied').attr({style : 'display : block'}) //form placeholder
                             input.value = data.couponCode
                             const couponData = input.value
-                            console.log('this is couponcode' , couponData);
                             let placeholder = data.couponCode.toUpperCase()
                             input.placeholder = `Applied ${placeholder}`
                             $('#couponCodeHere').html(data.couponCode)
-
                             $('#total-pay-to-server').attr({value : `${data.newTotalCartAmount}`})
                             $('#disc-to-server').attr({value : `${data.discountAmount}`})
                             $('#couponData').attr({value : `${couponData}`})
@@ -525,12 +544,15 @@
             })
 
             $(document).ready(() =>{
+              
+              const length = $('#lengthSpan').html()
+              console.log('this is lenghttt' , length);
+              if(length < 1){
+                $('addressTitle').attr({style : "display : none"})
+              }
               let total = $('#totalPayable').html()
-              console.log('this is totalpayable' , total);
               total = parseFloat(total.replace(/,/g, '').replace(/[^\d.-]/g, ''));
-              console.log('this is pre formated' , total);
               const walletAmount = document.getElementById('wallet-amount').innerHTML
-              console.log('this is wallet amount' , walletAmount);
               const walletRadio = document.getElementById('walletRadio')
               if(walletAmount < total){
                 const element = document.querySelector('#wallet-para')

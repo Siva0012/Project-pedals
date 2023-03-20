@@ -107,7 +107,6 @@ const sendOtp = async (req , res , next) =>{
             to : `${countryCode}${phone}`,
             channel : 'sms',
         })
-
         res.render('user_otp')
 
     }catch(error){
@@ -121,7 +120,6 @@ const verifyOtp = async (req , res , next) => {
   const phone = req.session.user.phone;
   const countryCode = req.session.user.countryCode;
   const otp = req.body.otp
-  console.log('this is ajaxxxxxxxxx body' , otp);
   const userData = req.session.user;
   try {
     /*-----------------verifying OTP--------------------------*/
@@ -145,14 +143,10 @@ const verifyOtp = async (req , res , next) => {
           const userDetails = await users.save();
           req.session.user_id = userDetails._id /*--------session created for user------*/
           if (userDetails) {
-            // res.redirect("/");
-            // console.log("user verified");
             res.redirect('/')
           }
         } else {
-        //   console.log("Not verified");
-        //   res.render("user_otp" , {verifyError : 'You have entered wrong OTP, Please try again'});
-        //   verifyError = undefined
+        
              res.render('user_otp' , {message : 'Invalid OTP'})
              message = undefined
         }
@@ -252,15 +246,11 @@ const viewProducts = async (req , res , next) =>{
 
         if(req.session.user_id){
             const userId = req.session.user_id
-            const pageNum = req.params.page
-            const perPage = 3
-            let docCount
-            console.log('type of user id is' , typeof userId , userId);
             const userData = await Users.findOne({ _id : req.session.user_id})
             if(!userData.block){
                 const catId = req.params.id
                 const userName = userData.userName
-                const showProducts =await Products.countDocuments({ category : catId , listed : true , stock : {$gt : 0}})
+                const showProducts =await Products.find({ category : catId , listed : true , stock : {$gt : 0}})
                 
                 const catData = await Category.find({})
                 //category name
@@ -335,8 +325,6 @@ const addToCart = async (req , res , next) =>{
             const userId = req.session.user_id
             const proId = req.params.id
             const productData = await Products.findOne({ _id : proId})
-            // console.log('this is proIddddddddddddddddddd in addtocart' , proId);
-            // console.log('this is userdddddddddddddddddd in addtocart' , userId);
             /*-----------updating user data with new product and it's price----------*/
             await Users.updateOne(
                 {_id : userId},
@@ -369,7 +357,6 @@ const addFromWish = async (req , res , next) =>{
                 { _id : userId , 'cart.productId' : productId}
             )
             .then( async (response) =>{
-                console.log('this is response in checking existing product in cartt' , response);
                 if(!response){
                     //add to cart
                     await Users.updateOne(
@@ -418,10 +405,7 @@ const viewWishList = async (req , res , next) =>{
             const userData = await Users.findOne({_id : userId})
             const userName = userData.userName
             const catData = await Category.find({})
-            console.log('wishlist page is loading');
             const wishData = await Users.findOne({ _id : userId }).populate('wishlist.productId')
-            console.log('this is wishdata' , wishData);
-
             res.render('wishlist_page' , {userName : userName , catData : catData , wishData : wishData} )
         }else{
             res.redirect('/userLogin')
@@ -460,19 +444,15 @@ const changePassword = async (req , res , next) =>{
             const userId = req.session.user_id
             const currentPassword = req.body.currentPassword
             const newPassword = req.body.newPassword
-            console.log('this is passwordssssssss' , currentPassword , newPassword);
             await Users.findOne({ _id : userId})
             .then((response) =>{
                 bcrypt.compare(currentPassword , response.password)
                 .then(async (status) =>{
-                    console.log('compared password');
                     if(status){
                         const password = await bcrypt.hash(newPassword , 10)
                         await Users.updateOne({ _id : userId} , {$set : {password : password}})
-                        console.log('password changed successfully');
                         res.json({message : 'password changed successfully'})
                     }else{
-                        console.log('password not matching');
                         res.json({error : 'You entered wrong current password'})
                     }
                 })
@@ -496,12 +476,6 @@ const deleteFromCart = async (req , res , next) =>{
             {_id : userId},
             {$pull : {cart : {productId : proId}}}
         )
-        // .then((async () =>{
-        //     const userData = await Users.findOne({_id : userId})
-        //     res.json(userData)
-        // }))
-        /*=========updating changes in cart=========*/    
-
         /*-------------updated user cart-------------*/
         const updatedCart = await Users.findOne({ _id : userId} , {cart : 1})
         /*--------------reducing each total product amount to cart total--------*/
@@ -588,7 +562,6 @@ const deleteAddress = async (req , res , next) =>{
                 {$pull : {addresses : {_id : addressId}}},
                 {new : true}
             )
-            // res.redirect('/viewAddresses')
             res.json({success : true})
         }
         
@@ -615,7 +588,6 @@ const editAddress = async (req , res , next) =>{
             }
             const addressId = req.body.addressId
             await Users.findByIdAndUpdate(userId, { $set: { "addresses.$[elem]": updatedAddress } }, { arrayFilters: [{ "elem._id": addressId }], new: true })
-           
             res.redirect('/viewAddresses')
         }        
     }catch(error){
@@ -654,10 +626,6 @@ const placeOrder = async (req , res , next) =>{
             const deliveryAddress = req.body.address
             const paymentMethod = req.body.paymentMethod
             const orderData = req.body
-
-            console.log('this is request body in placeorder' , req.body);
-            
-            
             const orderDetails = []
             orderData.products = orderDetails
             if(!Array.isArray(orderData.productId)){
@@ -703,7 +671,6 @@ const placeOrder = async (req , res , next) =>{
 
                         /*-------Changing cart amount--------*/
                         const userUpdate = await Users.updateOne({ _id : userId} , {$set : {totalCartAmount : '0'}})
-                        console.log('this is updated user' , userUpdate);
 
                         /*-----Empty cart-----*/
                         const orderData = await Orders.findOne({ _id : response._id}).populate('product.productId')
@@ -718,11 +685,9 @@ const placeOrder = async (req , res , next) =>{
                 })
             }else{
                 const totalCartAmount = Number(req.body.totalCartAmount[0])
-                console.log('this is totalcartamount in online section' ,typeof totalCartAmount , totalCartAmount);
                 // const orderId = `orderId-${uuidv4()}`
                 const orderId = `orderId-${uuidv4()}`.substring(0, 40);
                 req.session.orderId = orderId // saving orderId to session
-                console.log('this is orderid' , orderId);
 
                 /*------Razor pay instance-----*/
                 const options = {
@@ -734,7 +699,6 @@ const placeOrder = async (req , res , next) =>{
                     if(err){
                         console.log(err);
                     }else{
-                        console.log('created order hereeeeee and passing to the client' , order);
                         const orderSummary = new Orders( { /*----Saving order to the database----*/
                             userId : userId,
                             orderId : orderId,
@@ -750,8 +714,6 @@ const placeOrder = async (req , res , next) =>{
                             if(error){
                                 console.log('failed order submission');
                             }else{
-                                console.log("This is response from order confirmation" , response);
-                                console.log('this is order id from saved orderrrrrrrrrrrrrrrr' , response._id);
                                 newOrderId = response._id        
                             }
                         })
@@ -867,7 +829,7 @@ const redeemCoupon = async (req , res , next) =>{
                 if(isClaimed){
                     return res.json({claimed : 'Already claimed'})
                 }else{
-                    if(currentDate.getDate() <= expiryDate.getDate()){
+                    if(currentDate <= expiryDate){
                         if(totalCartAmount >= minPurchaseAmount){
     
                             const availableDiscountAmount = totalCartAmount * maxDiscountPercentage
@@ -1054,7 +1016,6 @@ module.exports = {
     viewCheckoutPage,
     changePassword,
     redeemCoupon,
-
     addToWishlist,
     removeFromWishlist,
     searchProducts,

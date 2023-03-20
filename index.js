@@ -42,8 +42,6 @@ app.use('/admin' , adminRoutes)
 //user route
 app.use('/' , userRoutes)
 
-//app.use('/*') for handling routes which are not defined
-
 //error handler for undefined routes
 app.use((req , res , next) =>{
     res.render('error')
@@ -58,7 +56,6 @@ app.use((err, req, res, next) => {
   });
 
 // app.use(morgan('dev'))
-
 app.listen(3000 , () =>{
     console.log('server has started at port 3000');
 })

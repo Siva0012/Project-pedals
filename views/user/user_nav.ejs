@@ -9,7 +9,7 @@
             <nav class="limiter-menu-desktop p-l-45">
                 
                 <!-- Logo desktop -->		
-                <a href="#" class="logo">
+                <a href="/" class="logo">
                     <img src="/images/pedals-black.png" alt="IMG-LOGO">
                 </a>
 
@@ -62,13 +62,13 @@
     <div class="wrap-header-mobile">
         <!-- Logo moblie -->		
         <div class="logo-mobile">
-            <a href="index.html"><img src="/images/pedals-black.png" alt="IMG-LOGO"></a>
+            <a href="/"><img src="/images/pedals-black.png" alt="IMG-LOGO"></a>
         </div>
 
         <!-- Icon header -->
         <div class="wrap-icon-header flex-w flex-r-m h-full m-r-15">
             <div class="flex-c-m h-full p-lr-10 bor5">
-                <div class="icon-header-item cl2 hov-cl1 trans-04 p-lr-11 icon-header-noti js-show-cart" data-notify="2">
+                <div class="icon-header-item cl2 hov-cl1 trans-04 p-lr-11  js-show-cart">
                     <i class="zmdi zmdi-shopping-cart"></i>
                 </div>
             </div>
@@ -85,22 +85,22 @@
 
     <!-- Menu Mobile -->
     <div class="menu-mobile">
-        <ul class="main-menu-m">
+        
 
+        <ul class="main-menu-m">
             <li>
-                <a href="/" style="text-decoration: none;">BIKES</a>
-                
+                <a href="/">BIKES</a>
                 <ul class="sub-menu-m" >
                     <% catData.forEach(catData =>{ %>
                         <%= console.log(catData); %>
                     <li><a href="/viewAllProducts/<%= catData._id %>" style="text-decoration: none;"> <%= catData.name %></a></li>
                     <% }) %>
                 </ul>
-                
                 <span class="arrow-main-menu-m">
                     <i class="fa fa-angle-right" aria-hidden="true"></i>
                 </span>
             </li>
+
             <li>
                 <a href="/viewWishlist">My wishlist</a>
             </li>
@@ -109,37 +109,28 @@
                 <a href="/viewOrders">My orders</a>
             </li>
 
-            <% if (typeof userName !== 'undefined') { %>
-                <ul class="mx-0 my-0 main-menu text-dark">
-                
-                    <li class="mx-0 my-0 active-menu text-dark">
-                        <a href="/userProfile" class="stext-102 cl2 hov-cl1 trans-04 text-dark">
-                            <%= userName %>
-                        </a>
-                        <ul class="sub-menu my-0">
-                            <li><a href="/userLogout" class="text-dark">Logout</a></li>
-                            
-                        </ul>
-                        
-                    </li>
+            <% if(typeof userName !== "undefined"){ %>
+                <li>
+                    <a href="/userProfile"><%= userName %></a>
+                    <ul class="sub-menu-m">
+                        <li>
+                            <a href="/userLogout">Logout</a>
+                        </li>
+                    </ul>
+                    <span class="arrow-main-menu-m">
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </span>
+                </li>
+            <% }else{ %>
+                <li>
+                    <a href="/userLogin">Account</a>
+                </li>
+            <% } %>
 
-                </ul>
-            <% } else{%>
-                <ul class="mx-0 my-0 main-menu text-dark">
-                
-                    <li class="mx-0 my-0 active-menu text-dark">
-                        <a href="/userLogin" class="stext-102 cl2 hov-cl1 trans-04 text-dark">
-                            Account
-                        </a>
-                        <ul class="sub-menu my-0">
-                            <li><a href="/userLogout" class="text-dark">Logout</a></li>
-                        </ul>
-                        
-                    </li>
-
-                </ul>
-            <% }%>
         </ul>
+
+
+
     </div>
 
     
@@ -265,10 +256,6 @@
                 <div class="header-cart-buttons flex-w w-full">
                     <a href="/viewCart" class="flex-c-m stext-101 cl0 size-107 bg3 bor2 hov-btn3 p-lr-15 trans-04 m-r-8 m-b-10">
                         View Cart
-                    </a>
-
-                    <a href="shoping-cart.html" class="flex-c-m stext-101 cl0 size-107 bg3 bor2 hov-btn3 p-lr-15 trans-04 m-b-10">
-                        Check Out
                     </a>
                 </div>
 

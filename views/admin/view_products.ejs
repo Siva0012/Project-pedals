@@ -27,7 +27,7 @@
 
         
 
-        <div class="card">
+        <div class="card overflow-auto">
           <div class="card-body">
             <!-- Bordered Table -->
             <table class="table table-bordered">
@@ -57,17 +57,23 @@
                       <td><%- productData.description %></td>
   
                       <td>
-                        <div class="button-wrapper d-flex justify-content-around">
+                        <div class="button-wrapper d-flex justify-content-between flex-column">
                           
-                          <a href="/admin/editProduct/<%= productData._id %>">
+                          <a href="/admin/editProduct/<%= productData._id %>" class="mb-2">
                             <button type="button" class="btn btn-warning ">Edit</button>
                           </a>
                             <% if(productData.listed === true) { %>
-                              <button type="button" class="btn btn-danger" onclick="unlistPro('<%= productData._id %>')">Unlist</button>
+                              <div class="button-wrapper mb-2">
+                                <button type="button" class="btn btn-danger" onclick="unlistPro('<%= productData._id %>')" class="mb-2">Unlist</button>
+                              </div>
                             <% }else{ %>
-                              <button type="button" class="btn btn-danger" onclick="listPro('<%= productData._id %>')">List</button>
+                              <div class="button-wrapper mb-2">
+                                <button type="button" class="btn btn-danger" onclick="listPro('<%= productData._id %>')" class="mb-2">List</button>
+                              </div>
                             <% } %>
-                            <button type="button" class="btn btn-danger" onclick="deletePro('<%= productData._id %>')">Delete</button>
+                            <div class="button-wrapper mb-2">
+                              <button type="button" class="btn btn-danger" onclick="deletePro('<%= productData._id %>')" class="mb-2">Delete</button>
+                            </div>
                         </div>
                       </td> 
   

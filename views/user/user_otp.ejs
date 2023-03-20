@@ -19,10 +19,10 @@
                             <% if(typeof message !== 'undefined') { %>
                                 <div class="alert alert-danger" role="alert">
                                     <%= message %>
-                                    <p class="text-danger">Please try again</p>
+                                    <p class="text-danger">Invalid OTP. Please try again</p>
                                   </div>
                             <% } %>
-                            <form method="post" action="/verifyOtp" id="otpForm" >
+                            <form method="post" action="/verifyOtp" id="otpForm" onsubmit="validateForm()" >
         
                                 <div class="mb-3">
                                     <label for="exampleInputPassword1" class="form-label text-danger">OTP</label>
@@ -31,6 +31,10 @@
         
                                 <button type="submit" class="btn btn-primary">Verify OTP</button>
                             </form>
+
+                            <div class="alert alert-warning mt-3" role="alert" style="display: none;" id="errorAlert">
+                  
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -42,38 +46,23 @@
 
 </div>
 <script>
-    // function validateForm() {
-    //   let inputs = document.getElementsByTagName("input")
 
-    //   for(let i=0; i< inputs.length; i++){
-    //     if(inputs[i].value == ""){
-    //       alert("Please enter the OTP")
-    //       return false;
-    //     }
-    //   }
-    //   return true;
-    // }
+    let validateForm = () =>{
+        const form = document.getElementById('otpForm')
+        const input = document.getElementById('userOtp')
+        document.addEventListener('submit' , (e) =>{
+            e.preventDefault()
+            if(input.value == ""){
+                $('#errorAlert').show().html('All fields are required!!')
+                setTimeout(() =>{
+                    $('#errorAlert').fadeOut('slow')
+                } , 2000)
+            }else{
+                form.submit()
+            }
+        })
+    }
 
-    // $('#otpForm').submit((event) =>{
-    //     event.preventDefault()
-    //     const otp = document.getElementById('userOtp').value
-    //     console.log(otp);
-    //     if(!otp){
-    //         $('#message').text('Please enter the OTP')
-    //         return
-    //     }
-    //     $.ajax({
-    //         type : 'POST',
-    //         url : '/verifyOtp',
-    //         data : {code : otp},
-    //         success : ((response) =>{
-    //             $('#alert').html(response.message)
-    //         }),
-    //         error : ((error) =>{
-    //             console.log(error);
-    //         })
-    //     })
-    // })
   </script>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 

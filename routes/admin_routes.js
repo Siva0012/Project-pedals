@@ -48,44 +48,44 @@ admin_router.get('/editProduct/:id' , auth.isLogIn , productController.viewEditP
 
 admin_router.get('/deleteProductImage/:productId/:imageName' , auth.isLogIn, productController.deleteProductImages)
 
-admin_router.post('/updateProduct' , productController.updateProduct)
+admin_router.post('/updateProduct' , auth.isLogIn , productController.updateProduct)
 
-admin_router.get('/viewBanner' , bannerController.viewBanner)
+admin_router.get('/viewBanner' , auth.isLogIn , bannerController.viewBanner)
 
-admin_router.get('/addBanner' , bannerController.showAddBanner)
+admin_router.get('/addBanner' , auth.isLogIn , bannerController.showAddBanner)
 
-admin_router.post('/insertBanner' , upload.single('image') , bannerController.insertBanner)
+admin_router.post('/insertBanner' , auth.isLogIn , upload.single('image') , bannerController.insertBanner)
 
-admin_router.get('/deleteBanner/:id' , bannerController.deleteBanner)
+admin_router.get('/deleteBanner/:id' , auth.isLogIn , auth.isLogIn , bannerController.deleteBanner)
 
-admin_router.get('/unlistProduct/:id' , adminController.unlistProduct)
+admin_router.get('/unlistProduct/:id' , auth.isLogIn , adminController.unlistProduct)
 
-admin_router.get('/listProduct/:id' , adminController.listProduct)
+admin_router.get('/listProduct/:id' , auth.isLogIn , adminController.listProduct)
 
-admin_router.get('/viewOrders' , adminController.viewOrders)
+admin_router.get('/viewOrders' , auth.isLogIn , adminController.viewOrders)
 
-admin_router.post('/updateProductImage' , upload.array('image' , 4) , productController.updateProductImage)
+admin_router.post('/updateProductImage' , auth.isLogIn , upload.array('image' , 4) , productController.updateProductImage)
 
 admin_router.get('/viewCoupons' , adminController.viewCoupons)
 
-admin_router.post('/addCoupon' , adminController.addCoupon)
+admin_router.post('/addCoupon' , auth.isLogIn , adminController.addCoupon)
 
-admin_router.post('/deleteCoupon' , adminController.deleteCoupon)
+admin_router.post('/deleteCoupon', auth.isLogIn , adminController.deleteCoupon)
 
-admin_router.get('/viewSingleOrder/:orderId' , adminController.viewSingleOrder)
+admin_router.get('/viewSingleOrder/:orderId' , auth.isLogIn , adminController.viewSingleOrder)
 
-admin_router.post('/changeOrderStatus/:status/:orderId' , adminController.changeOrderStatus)
+admin_router.post('/changeOrderStatus/:status/:orderId' , auth.isLogIn , adminController.changeOrderStatus)
 
-admin_router.get('/updateChart' ,adminController.updateChart)
+admin_router.get('/updateChart' , auth.isLogIn ,adminController.updateChart)
 
-admin_router.get('/updateDonut' , adminController.updateDonut)
+admin_router.get('/updateDonut' , auth.isLogIn , adminController.updateDonut)
 
-admin_router.get('/viewSalesReport' , adminController.viewSalesReport)
+admin_router.get('/viewSalesReport' , auth.isLogIn , adminController.viewSalesReport)
 
-admin_router.post('/getSalesReport' , adminController.getSalesReport)
+admin_router.post('/getSalesReport' , auth.isLogIn , adminController.getSalesReport)
 
-admin_router.get('/viewReturnRequests/:orderId' , adminController.viewReturnRequests)
+admin_router.get('/viewReturnRequests/:orderId' , auth.isLogIn , adminController.viewReturnRequests)
 
-admin_router.post('/changeReturnStatus/:status' , adminController.changeReturnStatus)
+admin_router.post('/changeReturnStatus/:status' , auth.isLogIn , adminController.changeReturnStatus)
 
 module.exports = admin_router

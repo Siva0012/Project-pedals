@@ -10,7 +10,6 @@ const insertCategory = async (req , res , next) =>{
 
     try{
         const catName = req.body.name
-        console.log('this is catName in server sideeeee' , catName);
         const existsCat = await Categories.findOne({name : {$regex : new RegExp( catName , "i" )}})
         
         if(existsCat){
@@ -65,9 +64,10 @@ const viewCategories = async (req , res , next) =>{
 
     try{
 
+        const adminData = await Admin.findOne({})
         const categoryData = await Categories.find({}).exec()
 
-        res.render('view_categories' , {categoryData : categoryData , moment : moment})
+        res.render('view_categories' , {categoryData : categoryData , adminData : adminData , moment : moment})
     }
     catch(error){
         next(error)

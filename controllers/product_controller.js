@@ -13,7 +13,7 @@ const insertProduct = async (req , res , next) =>{
         const proName = req.body.name
         const existsPro = await Products.findOne({ name : {$regex : new RegExp(proName , "i")}})
         if(existsPro){
-            res.redirect('/admin/addProducts')
+            res.json({message : "Product already exists!!"})
         }else{
             uploadedImages = req.files /* assigning req.files from multer to a variable*/
        const imageName = [] /* creating array for storing imagename*/
@@ -38,9 +38,12 @@ const insertProduct = async (req , res , next) =>{
         const productData = await product.save()/* Saving document to database*/
 
         if(productData){
-            res.redirect('/admin/viewproducts')
+            // res.redirect('/admin/viewproducts')
+            res.json({success : true})
         }else{
-            res.render('add_products')
+            const adminData = await Admin.findOne({})
+            // res.render('add_products' , {adminData : adminData})
+            res.json({message : "Couldn't add product"})
         }
         }
         
@@ -70,9 +73,9 @@ const deleteProduct = async (req , res , next) =>{
 const viewProducts = async (req , res , next) =>{
     
     try{
-        
+        const adminData = await Admin.findOne({})
         const productData = await Products.find({}).exec() /* find all products to list in view_products*/
-        res.render('view_products' , {productData}) /* listing products */
+        res.render('view_products' , {productData : productData , adminData : adminData}) /* listing products */
     }catch(error){
         next(error)
         console.log(error);
@@ -83,12 +86,12 @@ const viewProducts = async (req , res , next) =>{
 const viewEditProduct = async (req , res , next) =>{
     
     try{
+        const adminData = await Admin.findOne({})
         const productId = req.params.id
         const categoryData = await Categories.find({})
         const productData =await Products.find({ _id : productId})
         const imageData = await Products.findOne({_id : productId})
-        console.log('this is pro id' , imageData._id);
-        res.render('edit_product' , {categoryData : categoryData , imageData : imageData})
+        res.render('edit_product' , {categoryData : categoryData , imageData : imageData , adminData : adminData})
     }catch(error){
         next(error)
         console.log(error.message);
@@ -100,21 +103,16 @@ const deleteProductImages = async (req , res , next) =>{
         const productId = req.params.productId
         const imageName = req.params.imageName
         const imagePath = path.join(__dirname , '../public/product_images' , imageName)
-        console.log("this is imagepath",imagePath);
 
         const productData =await Products.findByIdAndUpdate(
             productId,
             {$pull : {images : imageName}},
             {new : true}
         )
-        console.log('this is new productData',productData);
-        
         fs.unlink(imagePath , (err)=>{
             if(err){
-                console.log("error in fs function",err);
                 res.status(500).json({ message: "Error deleting image" })
             }else{
-                console.log('deleted image');
                 res.json({ message: "Image deleted" })
             }
         })
@@ -130,8 +128,6 @@ const deleteProductImages = async (req , res , next) =>{
 const updateProduct = async (req , res , next) =>{
     try{    
             const formData = req.body
-            console.log('thsi is req body in updateProduct' , formData);
-            console.log('this is nameeeeeeeeeeeeeeeeeeee' , req.body.name);
             if(formData.description == ''){
                 await Products.findOne({_id : formData.proId})
                 .then((response) =>{
@@ -187,9 +183,6 @@ const updateProductImage = async (req , res , next) =>{
         console.log(error.message);
     }
 }
-
-
-
 
 
 module.exports = {

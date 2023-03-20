@@ -34,7 +34,6 @@ const placeOrder = async (req , res , next) =>{
             const orderData = req.body
             req.session.couponCode = req.body.couponData
             let discountAmount = Number(req.body.discountAmount) 
-            console.log('this is discount amount' , discountAmount);
             const orderDetails = []
             orderData.products = orderDetails
             if(!Array.isArray(orderData.productId)){
@@ -64,7 +63,6 @@ const placeOrder = async (req , res , next) =>{
             }
             /*----checking payment method---*/
             if(paymentMethod === "cod"){                                                        /*-----------cod-----------*/
-                console.log('thisssssssssss i s discount amountttt' , discountAmount);
                 const orderSummary = new Orders( {
                     userId : userId,
                     orderId : `orderId_${uuidv4()}`,
@@ -116,11 +114,9 @@ const placeOrder = async (req , res , next) =>{
                 })
             }else if(paymentMethod === "online"){                                                                             /*------------Online payment---------*/
                 const totalCartAmount = Number(req.body.totalCartAmount[0])
-                console.log('this is totalcartamount in online section' ,typeof totalCartAmount , totalCartAmount);
                 // const orderId = `orderId-${uuidv4()}`
                 const orderId = `orderId-${uuidv4()}`.substring(0, 40);
                 req.session.orderId = orderId // saving orderId to session
-                console.log('this is orderid' , orderId);
 
                 /*------Razor pay instance-----*/
                 const options = {
@@ -132,7 +128,6 @@ const placeOrder = async (req , res , next) =>{
                     if(err){
                         console.log(err);
                     }else{
-                        console.log('created order hereeeeee and passing to the client' , order);
                         const orderSummary = new Orders( { /*----Saving order to the database----*/
                             userId : userId,
                             orderId : orderId,
@@ -234,8 +229,6 @@ const verifyPayment = async (req , res , next) =>{
             hash = hash.digest('hex')
 
             if(hash == payment.razorpay_signature){
-                console.log('Payment is successfull');
-                
                 await Orders.findOne({ orderId : sessionOrderId })
                 .then((response) =>{
                     console.log('this is orderssss' , response);
@@ -281,7 +274,6 @@ const verifyPayment = async (req , res , next) =>{
                 })
                 
             }else{
-                console.log('payment failed');
                 /*-------changing order status to payment failed-----*/
                 await Orders.updateOne({ orderId : session } , {$set : {status : "Payment failed"}})
                 .then((response , err) =>{

@@ -17,17 +17,17 @@
 
                             <div class="content-wrapper border border-3 border-primary rounded-4 p-5">
 
-                                <form class="text-black" action="/verifyUser" method="post" onsubmit="return validateForm()">
+                                <form class="text-black" action="/verifyUser" method="post" onsubmit="validateForm()" id="loginForm">
                                     <div class="mb-3">
 
                                         <label for="exampleInputEmail1"  class="form-label">User name</label>
-                                        <input type="text" name="userName" value="siva" class="form-control border-primary-subtle" id="firstName">
+                                        <input type="text" name="userName" class="form-control border-primary-subtle" id="firstName">
 
                                     </div>
 
                                     <div class="mb-3">
                                         <label for="exampleInputPassword1" class="form-label">Password</label>
-                                        <input type="password" name="password" value="123" class="form-control border-primary-subtle"
+                                        <input type="password" name="password" class="form-control border-primary-subtle"
                                             id="exampleInputPassword1">
                                     </div>
 
@@ -38,21 +38,27 @@
                                         <span>Don't have an account?</span><a href="/viewUserSignup" class="text-primary">Signup here</a>
                                     </div>
 
-                                    <% if(typeof loginError !== 'undefined') { %>
-                                        <div class="alert alert-warning mt-4" role="alert">
-                                            <%= loginError %>
-                                        </div>
-
-                                    <% } %>
-                                    <% if(typeof isBlocked !== 'undefined') { %>
-                                        <div class="alert alert-warning mt-4" role="alert">
-                                            <%= isBlocked %>
-                                        </div>
-
-                                    <% } %>
+                                    <div id="invalidDiv">
+                                        <% if(typeof loginError !== 'undefined') { %>
+                                            <div class="alert alert-warning mt-4 loginError" role="alert">
+                                                <%= loginError %>
+                                            </div>
+    
+                                        <% } %>
+                                        <% if(typeof isBlocked !== 'undefined') { %>
+                                            <div class="alert alert-warning mt-4 loginError" role="alert">
+                                                <%= isBlocked %>
+                                            </div>
+    
+                                        <% } %>
+                                    </div>
 
 
                                 </form>
+
+                                <div class="alert alert-warning mt-3" role="alert" style="display: none;" id="errorAlert">
+                  
+                                </div>
 
 
                             </div>
@@ -67,17 +73,40 @@
     </div>
 
     <script>
-        function validateForm() {
-          let inputs = document.getElementsByTagName("input")
-  
-          for(let i=0; i< inputs.length; i++){
-            if(inputs[i].value == ""){
-              alert("All fields are required!!")
-              return false;
-            }
-          }
-          return true;
+        
+        let validateForm = () =>{
+            const form = document.getElementById('loginForm')
+            const inputs = form.querySelectorAll('input')
+            let nullField = false
+            document.addEventListener('submit' , (e) =>{
+                e.preventDefault()
+                for(let i = 0 ; i < inputs.length ; i++){
+                    if(inputs[i].value == ""){
+                        nullField = true
+                        $('#errorAlert').attr({style : 'display : block'}).html('All fields are required!!')
+                    setTimeout(() =>{
+                        $('#errorAlert').fadeOut('slow')
+                    } , 2000)
+                    break
+                    }
+                }
+                if(!nullField){
+                    form.submit()
+                }
+            })
+        
         }
-      </script>
+
+        let invalidDiv = document.getElementById('invalidDiv')
+        document.addEventListener("DOMContentLoaded" , () =>{
+            const loginError = document.querySelectorAll('.loginError')
+            if(loginError){
+                setTimeout(() =>{
+                    $('#invalidDiv').fadeOut('slow')
+                } , 2000)
+            }
+        })
+
+    </script>
 
     <%- include('../layout/user/user_login_footer.ejs') %>

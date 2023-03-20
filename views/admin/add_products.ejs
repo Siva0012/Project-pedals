@@ -9,7 +9,7 @@
       <h1>Add products</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="index.html">Admin</a></li>
+          <li class="breadcrumb-item"><a href="/admin">Admin</a></li>
           <li class="breadcrumb-item active">Add products</li>
         </ol>
       </nav>
@@ -23,7 +23,7 @@
             <div class="card-body">
 
               <!-- General Form Elements -->
-              <form action="/admin/insertProducts" method="post" enctype="multipart/form-data"> 
+              <form action="/admin/insertProducts" method="post" enctype="multipart/form-data" id="addForm"> 
                 <div class="row my-3 ">
                   <label for="inputText" class="col-sm-2 col-form-label">Product name</label>
                   <div class="col-sm-10">
@@ -80,6 +80,10 @@
 
               </form><!-- form ends here -->
 
+              <div class="alert alert-warning mt-2" role="alert" id="alertDiv" style="display: none;">
+
+              </div>
+
             </div>
           </div>
 
@@ -89,7 +93,77 @@
       </div>
     </section>
 
+    
   </main><!-- End #main -->
+
+  <script>
+
+    const form = document.getElementById('addForm')
+    const inputs = form.querySelectorAll('input')
+
+    document.addEventListener('submit' , (e) =>{
+      e.preventDefault()
+      console.log('this is inputs' , inputs)
+      let nullField = false
+      for(let i = 0 ; i < inputs.length ; i++){
+        if(inputs[i].value == ""){
+          $('#alertDiv').show().html('All fields are required!!')
+          setTimeout(() =>{
+            $('#alertDiv').fadeOut('slow')
+          } , 2000)
+          nullField =  true
+          break
+        }
+      }
+      if(!nullField){
+        console.log('calling ajaaxxxx');
+        const body = new FormData(form)
+        console.log('this is formdata' , body);
+        $.ajax(
+          {
+            url : '/admin/insertProducts',
+            data : body,
+            method : "POST",
+            processData: false,
+            contentType: false,
+            success : (response) =>{
+              console.log('this is response' , response);
+              if(response.success){
+                Swal.fire({
+                  position: 'center',
+                  icon: 'success',
+                  title: 'Product added',
+                  showConfirmButton: false,
+                  timer: 1500
+                })
+                setTimeout(() =>{
+                  location.href = '/admin/viewProducts'
+                } , 1500)
+              }else {
+                const Toast = Swal.mixin({
+                  toast: true,
+                  position: 'center',
+                  showConfirmButton: false,
+                  timer: 2500,
+                  timerProgressBar: true,
+                  didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                  }
+                })
+                Toast.fire({
+                  title: response.message
+                })
+              }
+            }
+          }
+        )
+      }
+    })
+
+
+
+  </script>
 
 
 

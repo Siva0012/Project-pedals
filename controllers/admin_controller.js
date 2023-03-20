@@ -61,7 +61,6 @@ const adminPanel = async (req , res , next)=> {
         const totalSales = await Orders.find(
             {status : 'delivered'}
         ).count()
-        console.log('total sales' , totalSales);
         const revenue = await Orders.aggregate(
             [
                 {
@@ -77,9 +76,6 @@ const adminPanel = async (req , res , next)=> {
         const now = new Date()
         const weekStart = new Date(now.getFullYear() , now.getMonth() , now.getDate() - 6 , 0 , 0 , 0 )
         const weekEnd = new Date(now.getFullYear() , now.getMonth() , now.getDate() , 23 , 59 , 59 , 999)
-
-        console.log('this is weekstart' , weekStart);
-        console.log('this is weekend' , weekEnd);
 
         let recentData = await Orders.aggregate(
             [
@@ -111,9 +107,7 @@ const adminPanel = async (req , res , next)=> {
 
         recentData = recentData.reverse()
         const adminData = await Admin.findOne({})
-
             res.render('admin_panel' , {totalSales : totalSales , revenue : revenue[0].total , recentData : recentData , moment : moment , adminData : adminData})
-
     }catch(error){
         next(error)
         console.log(error.message);
@@ -124,8 +118,9 @@ const adminPanel = async (req , res , next)=> {
 const addProducts = async (req , res , next) =>{ 
 
     try{
+        const adminData = await Admin.findOne({})
         const catagoryData = await Categories.find({})
-        res.render('add_products' , {catagoryData})
+        res.render('add_products' , {catagoryData : catagoryData , adminData : adminData})
     }catch(error){
         next(error)
         console.log(error);
@@ -193,7 +188,7 @@ const listProduct = async (req , res , next) =>{
         const proId = req.params.id
         const adminData = await Admin.findOne({})
         const proData = await Products.updateOne({ _id : proId} , {listed : 'true'})
-        res.redirect('/admin/viewProducts' , {adminData : adminData})
+        res.redirect('/admin/viewProducts')
     }catch(error){
         next(error)
         console.log(error.message);
@@ -215,8 +210,7 @@ const viewOrders = async (req , res , next) =>{
                 orderDetails.push(response)
             })
         }
-        orderDetails = orderDetails.reverse() /*===================================adminData to all function and check discount amount by ordering something, after that, check wallet payment options conditions like if cod and online there are difference==================================*/
-
+        orderDetails = orderDetails.reverse() 
         res.render('view_orders' , {orderDetails : orderDetails , moment : moment , adminData : adminData})
 
     }catch(error){
@@ -231,10 +225,7 @@ const viewSingleOrder = async (req , res , next) =>{
     try{
         const adminData = await Admin.findOne({})
         const orderId =  req.params.orderId
-        console.log('this is orderId in viewSingleOrderrr' , orderId);
-
         const orderData = await Orders.findOne({ _id : orderId}).populate('product.productId').populate('userId')
-        console.log('this is the orderData in viewSingleOrder' , orderData);
         res.render('view_single_order' , {orderData : orderData , moment : moment , adminData : adminData})
     }catch(error){
         next(error)
@@ -288,11 +279,9 @@ const addCoupon = async (req , res , next) =>{
 const deleteCoupon = async (req , res , next) =>{
 
     try{
-        console.log('this is req.body in serverside' , req.body);
         const couponId = req.body.couponId
         await Coupons.findByIdAndDelete(couponId)
         .then((response) =>{
-            console.log('this is response after deletion' , response);
             res.json(response )
         })
     }catch(error){
@@ -305,12 +294,9 @@ const changeOrderStatus = async (req , res , next) =>{
 
     try{
         const status = req.params.status
-        console.log(status);
         const orderId = req.params.orderId
         if(status === "returnaccepted"){
             const response = await Orders.findOneAndUpdate({ _id : orderId} , {$set : {status : "return accepted"}}).populate('product.prodcutId')
-            console.log('this is response in return accepted' , response);
-            console.log('this is products in the same' , response.product);
         }else if(status === "returndeclined"){
             const response = await Orders.updateOne({ _id : orderId} , {$set : {status : "return declined"}})
         }else if(status === "delivered"){
@@ -385,21 +371,12 @@ const updateChart = async (req, res, next) => {
     try {
 
         const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-        console.log('this is oneweekago' , oneWeekAgo);
         const salesPerDay = await Orders.aggregate([
             {
                 $match: {
                     $and: [
                         {
-                            $or: [
-                                {
-                                    $and: [
-                                        { paymentType: "online" },
-                                        { status: { $not: { $eq: "pending" } } },
-                                    ],
-                                },
-                                { $and: [{ paymentType: "cod" }, { status: "delivered" }] },
-                            ],
+                            status : "delivered"
                         },
                         { date: { $gte: oneWeekAgo } },
                     ],
@@ -433,8 +410,7 @@ const updateDonut = async (req , res , next) =>{
 
     try{
         await Orders.aggregate([
-
-            {$match : {$or : [{$and : [{paymentType : "online"} , {status : {$not : {$eq : 'pending'}}}]} , {$and : [{paymentType : "cod"} , {status : "delivered"} ] } ]}},
+            {$match : {status : "delivered"}},
             {$group : {_id : "$paymentType" , count : {$sum : 1 }}}
         ])
         .then((response) =>{
@@ -466,7 +442,6 @@ const getSalesReport = async (req , res , next) =>{
 
     try{
         const adminData = await Admin.findOne({})
-        console.log('this is req body inr report' , req.body);
         const {fromDate , toDate} = req.body
         
         // Set the start date to the beginning of the day
@@ -477,7 +452,6 @@ const getSalesReport = async (req , res , next) =>{
         const endDate = new Date(toDate);
         endDate.setHours(23, 59, 59, 999);
 
-        console.log(startDate , endDate);
         let salesReport = await Orders.find(
             {status : "delivered" , date : {$gte : startDate , $lte : endDate}}
         ).populate('userId')
